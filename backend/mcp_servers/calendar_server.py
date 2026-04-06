@@ -27,14 +27,14 @@ async def handle_list_tools() -> list[types.Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "title": {"type": "string", "description": "Event title"},
+                    "patient_name": {"type": "string", "description": "Patient's name"},
+                    "doctor_name": {"type": "string", "description": "Doctor's name"},
                     "start_time": {"type": "string", "description": "Start time in ISO format"},
                     "end_time": {"type": "string", "description": "End time in ISO format"},
-                    "description": {"type": "string", "description": "Event description"},
-                    "location": {"type": "string", "description": "Location or meeting link"},
-                    "attendees": {"type": "array", "items": {"type": "string"}, "description": "Attendee emails"},
+                    "reason": {"type": "string", "description": "Reason for appointment"},
+                    "location": {"type": "string", "description": "Location or room"},
                 },
-                "required": ["title", "start_time", "end_time"],
+                "required": ["patient_name", "doctor_name", "start_time", "end_time"],
             },
         ),
         types.Tool(
@@ -73,18 +73,18 @@ async def handle_call_tool(name: str, arguments: dict | None) -> list[types.Text
         async with db_conn.AsyncSessionLocal() as db:
             event = await crud.create_event(
                 db,
-                title=arguments.get("title", "Untitled Event"),
+                patient_name=arguments.get("patient_name", "Unknown"),
+                doctor_name=arguments.get("doctor_name", "Unknown"),
                 start_time=arguments.get("start_time"),
                 end_time=arguments.get("end_time"),
-                description=arguments.get("description", ""),
+                reason=arguments.get("reason", ""),
                 location=arguments.get("location", ""),
-                attendees=arguments.get("attendees", []),
             )
             await db.commit()
         return [types.TextContent(
             type="text",
             text=(
-                f"Event scheduled: '{event.title}'\n"
+                f"Appointment scheduled: {event.patient_name} with Dr. {event.doctor_name}\n"
                 f"  📅 {event.start_time.strftime('%Y-%m-%d %H:%M')} → {event.end_time.strftime('%H:%M')}\n"
                 f"  📍 {event.location or 'No location'}\n"
                 f"  ID: {event.id}"
@@ -111,11 +111,10 @@ async def handle_call_tool(name: str, arguments: dict | None) -> list[types.Text
             return [types.TextContent(type="text", text="No upcoming events found in that time range.")]
         lines = [f"Found {len(events)} upcoming event(s):\n"]
         for i, e in enumerate(events, 1):
-            attendee_str = f" ({len(e.attendees or [])} attendees)" if e.attendees else ""
             lines.append(
-                f"{i}. 📅 {e.title}\n"
+                f"{i}. 📅 {e.patient_name} with Dr. {e.doctor_name}\n"
                 f"   {e.start_time.strftime('%a %b %d, %H:%M')} → {e.end_time.strftime('%H:%M')}\n"
-                f"   📍 {e.location or 'No location'}{attendee_str}  ID:{e.id}"
+                f"   📍 {e.location or 'No location'}  ID:{e.id}"
             )
         return [types.TextContent(type="text", text="\n".join(lines))]
 
@@ -138,7 +137,7 @@ async def handle_call_tool(name: str, arguments: dict | None) -> list[types.Text
         lines = [f"⚠️ CONFLICT – {len(events)} event(s) overlap with that time slot:\n"]
         for e in events:
             lines.append(
-                f"  - {e.title} ({e.start_time.strftime('%H:%M')}–{e.end_time.strftime('%H:%M')})"
+                f"  - {e.patient_name} with Dr. {e.doctor_name} ({e.start_time.strftime('%H:%M')}–{e.end_time.strftime('%H:%M')})"
             )
         return [types.TextContent(type="text", text="\n".join(lines))]
 

@@ -72,7 +72,7 @@ async def run(
     yield {"type": "thought", "content": f"🔧 Calling MCP tool: {tool_name}"}
 
     results = await notes_tool(tool_name, tool_args)
-    tool_output = results[0].text
+    tool_output = results[0].text if results else "No output"
 
     if tool_name == "create_note":
         yield {"type": "thought", "content": "✅ Note saved to database."}

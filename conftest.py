@@ -15,6 +15,7 @@ os.environ.setdefault("DB_PASSWORD", "test")
 os.environ.setdefault("DB_NAME", "test")
 os.environ.setdefault("GOOGLE_CLOUD_PROJECT", "test-project")
 os.environ.setdefault("GOOGLE_CLOUD_REGION", "us-central1")
+os.environ.setdefault("GOOGLE_API_KEY", "dummy-api-key")
 
 # Override DB URL to in-memory SQLite before any app import
 import backend.database.connection as _conn
@@ -102,9 +103,10 @@ async def client():
 @pytest_asyncio.fixture
 async def sample_task(client):
     """Create and return a sample task for use in tests."""
-    resp = await client.post("/api/tasks", json={
+    resp = await client.post("/api/clinical-tasks", json={
         "title": "Sample Task",
         "description": "Created by fixture",
+        "patient_name": "Test Patient",
         "priority": "medium",
         "tags": ["fixture", "test"],
     })
@@ -113,12 +115,14 @@ async def sample_task(client):
 
 @pytest_asyncio.fixture
 async def sample_event(client):
-    """Create and return a sample calendar event."""
+    """Create and return a sample calendar appointment."""
     from datetime import datetime, timedelta, timezone
     start = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
     end = (datetime.now(timezone.utc) + timedelta(days=1, hours=1)).isoformat()
-    resp = await client.post("/api/events", json={
-        "title": "Sample Event",
+    resp = await client.post("/api/appointments", json={
+        "patient_name": "Test Patient",
+        "doctor_name": "Dr. Test",
+        "reason": "Routine Checkup",
         "start_time": start,
         "end_time": end,
         "location": "Zoom",
@@ -128,9 +132,9 @@ async def sample_event(client):
 
 @pytest_asyncio.fixture
 async def sample_note(client):
-    """Create and return a sample note."""
-    resp = await client.post("/api/notes", json={
-        "title": "Sample Note",
+    """Create and return a sample patient record."""
+    resp = await client.post("/api/patient-records", json={
+        "patient_name": "Test Patient",
         "content": "This is sample note content created by a fixture.",
         "tags": ["fixture"],
     })

@@ -1,0 +1,1165 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.1, pytest-9.0.2, pluggy-1.6.0
+rootdir: C:\Users\hp\Downloads\files (2)
+configfile: pyproject.toml
+plugins: anyio-4.12.0, langsmith-0.7.22, asyncio-1.3.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 12 items
+
+test_agents.py::test_chat_returns_sse_stream 
+-------------------------------- live log call --------------------------------
+INFO     agentflow.access:middleware.py:35 [aa665c33] POST /api/chat 200 14.0ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/chat "HTTP/1.1 200 OK"
+PASSED                                                                   [  8%]
+test_agents.py::test_chat_returns_session_id 
+-------------------------------- live log call --------------------------------
+INFO     agentflow.access:middleware.py:35 [fe3f4d56] POST /api/chat 200 2.9ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/chat "HTTP/1.1 200 OK"
+PASSED                                                                   [ 16%]
+test_agents.py::test_chat_with_explicit_session 
+-------------------------------- live log call --------------------------------
+INFO     agentflow.access:middleware.py:35 [7d301c33] POST /api/chat 200 2.3ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/chat "HTTP/1.1 200 OK"
+PASSED                                                                   [ 25%]
+test_agents.py::test_session_history 
+-------------------------------- live log call --------------------------------
+INFO     agentflow.access:middleware.py:35 [9d7e5214] POST /api/chat 200 2.8ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/chat "HTTP/1.1 200 OK"
+INFO     agentflow.access:middleware.py:35 [602d7780] GET /api/sessions/history-test-session/history 200 5.7ms
+INFO     httpx:_client.py:1740 HTTP Request: GET http://testserver/api/sessions/history-test-session/history "HTTP/1.1 200 OK"
+PASSED                                                                   [ 33%]
+test_agents.py::test_health_includes_model 
+-------------------------------- live log call --------------------------------
+INFO     agentflow.access:middleware.py:35 [2c93d0b4] GET /api/health 200 0.8ms
+INFO     httpx:_client.py:1740 HTTP Request: GET http://testserver/api/health "HTTP/1.1 200 OK"
+PASSED                                                                   [ 41%]
+test_agents.py::test_task_full_lifecycle 
+------------------------------- live log setup --------------------------------
+INFO     agentflow.access:middleware.py:35 [ce94e488] POST /api/clinical-tasks 201 9.0ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/clinical-tasks "HTTP/1.1 201 Created"
+-------------------------------- live log call --------------------------------
+WARNING  agentflow.access:middleware.py:35 [ff7a5705] GET /api/clinical-tasks/7acf6dfc-9256-471f-baad-abdd3fc3ad52 405 1.2ms
+INFO     httpx:_client.py:1740 HTTP Request: GET http://testserver/api/clinical-tasks/7acf6dfc-9256-471f-baad-abdd3fc3ad52 "HTTP/1.1 405 Method Not Allowed"
+FAILED                                                                   [ 50%]
+test_agents.py::test_event_full_lifecycle 
+------------------------------- live log setup --------------------------------
+INFO     agentflow.access:middleware.py:35 [7f049273] POST /api/appointments 201 6.8ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/appointments "HTTP/1.1 201 Created"
+-------------------------------- live log call --------------------------------
+WARNING  agentflow.access:middleware.py:35 [4e347708] GET /api/appointments/c661b03e-4b0d-43ed-abeb-a46c7216813a 405 0.4ms
+INFO     httpx:_client.py:1740 HTTP Request: GET http://testserver/api/appointments/c661b03e-4b0d-43ed-abeb-a46c7216813a "HTTP/1.1 405 Method Not Allowed"
+FAILED                                                                   [ 58%]
+test_agents.py::test_note_full_lifecycle 
+------------------------------- live log setup --------------------------------
+INFO     agentflow.access:middleware.py:35 [1c574f84] POST /api/patient-records 201 5.7ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/patient-records "HTTP/1.1 201 Created"
+-------------------------------- live log call --------------------------------
+WARNING  agentflow.access:middleware.py:35 [b9b9b06a] GET /api/patient-records/6fb17115-241f-44dd-a173-41258abb1eea 405 0.4ms
+INFO     httpx:_client.py:1740 HTTP Request: GET http://testserver/api/patient-records/6fb17115-241f-44dd-a173-41258abb1eea "HTTP/1.1 405 Method Not Allowed"
+FAILED                                                                   [ 66%]
+test_agents.py::test_task_priority_filter 
+-------------------------------- live log call --------------------------------
+INFO     agentflow.access:middleware.py:35 [ba4b76d2] POST /api/clinical-tasks 201 4.3ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/clinical-tasks "HTTP/1.1 201 Created"
+INFO     agentflow.access:middleware.py:35 [af237399] POST /api/clinical-tasks 201 4.1ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/clinical-tasks "HTTP/1.1 201 Created"
+INFO     agentflow.access:middleware.py:35 [294199c8] GET /api/clinical-tasks 200 3.3ms
+INFO     httpx:_client.py:1740 HTTP Request: GET http://testserver/api/clinical-tasks?priority=high "HTTP/1.1 200 OK"
+PASSED                                                                   [ 75%]
+test_agents.py::test_events_date_filter 
+-------------------------------- live log call --------------------------------
+INFO     agentflow.access:middleware.py:35 [4eaeadf0] POST /api/appointments 201 3.8ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/appointments "HTTP/1.1 201 Created"
+ERROR    agentflow.access:middleware.py:27 [998f51c6] GET /api/appointments ERROR 1.3ms — Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+ERROR    agentflow.errors:exceptions.py:77 Unhandled error on /api/appointments: Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 79, in collapse_excgroups
+  |     yield
+  |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 192, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\anyio\_backends\_asyncio.py", line 783, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |                                    ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 24, in dispatch
+    |     response: Response = await call_next(request)
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |                                    ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 50, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 716, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 736, in app
+    |     await route.handle(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 290, in handle
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 134, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 120, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 674, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\main.py", line 189, in list_events
+    |     events = await crud.get_events(
+    |              ^^^^^^^^^^^^^^^^^^^^^^
+    |         db, start_from=start_from, start_until=start_until, limit=limit
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\database\crud.py", line 166, in get_events
+    |     stmt = stmt.where(Appointment.start_time >= datetime.fromisoformat(start_from))
+    |                                                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+    | ValueError: Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 24, in dispatch
+    response: Response = await call_next(request)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 674, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Downloads\files (2)\backend\main.py", line 189, in list_events
+    events = await crud.get_events(
+             ^^^^^^^^^^^^^^^^^^^^^^
+        db, start_from=start_from, start_until=start_until, limit=limit
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\hp\Downloads\files (2)\backend\database\crud.py", line 166, in get_events
+    stmt = stmt.where(Appointment.start_time >= datetime.fromisoformat(start_from))
+                                                ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+ValueError: Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+FAILED                                                                   [ 83%]
+test_agents.py::test_invalid_task_id_returns_404 
+-------------------------------- live log call --------------------------------
+WARNING  agentflow.access:middleware.py:35 [783fa3fa] GET /api/clinical-tasks/00000000-0000-0000-0000-000000000000 405 0.4ms
+INFO     httpx:_client.py:1740 HTTP Request: GET http://testserver/api/clinical-tasks/00000000-0000-0000-0000-000000000000 "HTTP/1.1 405 Method Not Allowed"
+FAILED                                                                   [ 91%]
+test_agents.py::test_missing_required_fields 
+-------------------------------- live log call --------------------------------
+WARNING  agentflow.errors:exceptions.py:69 Validation error on /api/clinical-tasks: [{'field': 'title', 'message': 'Field required', 'type': 'missing'}]
+WARNING  agentflow.access:middleware.py:35 [7802b726] POST /api/clinical-tasks 422 2.0ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/clinical-tasks "HTTP/1.1 422 Unprocessable Entity"
+PASSED                                                                   [100%]
+
+================================== FAILURES ===================================
+__________________________ test_task_full_lifecycle ___________________________
+test_agents.py:79: in test_task_full_lifecycle
+    assert resp.json()["title"] == "Sample Task"
+           ^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'title'
+---------------------------- Captured stderr setup ----------------------------
+2026-04-06 22:55:48 | INFO     | agentflow.access | [ce94e488] POST /api/clinical-tasks 201 9.0ms
+2026-04-06 22:55:48 | INFO     | httpx | HTTP Request: POST http://testserver/api/clinical-tasks "HTTP/1.1 201 Created"
+----------------------------- Captured log setup ------------------------------
+INFO     agentflow.access:middleware.py:35 [ce94e488] POST /api/clinical-tasks 201 9.0ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/clinical-tasks "HTTP/1.1 201 Created"
+---------------------------- Captured stderr call -----------------------------
+2026-04-06 22:55:48 | WARNING  | agentflow.access | [ff7a5705] GET /api/clinical-tasks/7acf6dfc-9256-471f-baad-abdd3fc3ad52 405 1.2ms
+2026-04-06 22:55:48 | INFO     | httpx | HTTP Request: GET http://testserver/api/clinical-tasks/7acf6dfc-9256-471f-baad-abdd3fc3ad52 "HTTP/1.1 405 Method Not Allowed"
+------------------------------ Captured log call ------------------------------
+WARNING  agentflow.access:middleware.py:35 [ff7a5705] GET /api/clinical-tasks/7acf6dfc-9256-471f-baad-abdd3fc3ad52 405 1.2ms
+INFO     httpx:_client.py:1740 HTTP Request: GET http://testserver/api/clinical-tasks/7acf6dfc-9256-471f-baad-abdd3fc3ad52 "HTTP/1.1 405 Method Not Allowed"
+__________________________ test_event_full_lifecycle __________________________
+test_agents.py:105: in test_event_full_lifecycle
+    assert resp.json()["patient_name"] == "Test Patient"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'patient_name'
+---------------------------- Captured stderr setup ----------------------------
+2026-04-06 22:55:49 | INFO     | agentflow.access | [7f049273] POST /api/appointments 201 6.8ms
+2026-04-06 22:55:49 | INFO     | httpx | HTTP Request: POST http://testserver/api/appointments "HTTP/1.1 201 Created"
+----------------------------- Captured log setup ------------------------------
+INFO     agentflow.access:middleware.py:35 [7f049273] POST /api/appointments 201 6.8ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/appointments "HTTP/1.1 201 Created"
+---------------------------- Captured stderr call -----------------------------
+2026-04-06 22:55:49 | WARNING  | agentflow.access | [4e347708] GET /api/appointments/c661b03e-4b0d-43ed-abeb-a46c7216813a 405 0.4ms
+2026-04-06 22:55:49 | INFO     | httpx | HTTP Request: GET http://testserver/api/appointments/c661b03e-4b0d-43ed-abeb-a46c7216813a "HTTP/1.1 405 Method Not Allowed"
+------------------------------ Captured log call ------------------------------
+WARNING  agentflow.access:middleware.py:35 [4e347708] GET /api/appointments/c661b03e-4b0d-43ed-abeb-a46c7216813a 405 0.4ms
+INFO     httpx:_client.py:1740 HTTP Request: GET http://testserver/api/appointments/c661b03e-4b0d-43ed-abeb-a46c7216813a "HTTP/1.1 405 Method Not Allowed"
+__________________________ test_note_full_lifecycle ___________________________
+test_agents.py:120: in test_note_full_lifecycle
+    assert resp.json()["patient_name"] == "Test Patient"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'patient_name'
+---------------------------- Captured stderr setup ----------------------------
+2026-04-06 22:55:49 | INFO     | agentflow.access | [1c574f84] POST /api/patient-records 201 5.7ms
+2026-04-06 22:55:49 | INFO     | httpx | HTTP Request: POST http://testserver/api/patient-records "HTTP/1.1 201 Created"
+----------------------------- Captured log setup ------------------------------
+INFO     agentflow.access:middleware.py:35 [1c574f84] POST /api/patient-records 201 5.7ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/patient-records "HTTP/1.1 201 Created"
+---------------------------- Captured stderr call -----------------------------
+2026-04-06 22:55:49 | WARNING  | agentflow.access | [b9b9b06a] GET /api/patient-records/6fb17115-241f-44dd-a173-41258abb1eea 405 0.4ms
+2026-04-06 22:55:49 | INFO     | httpx | HTTP Request: GET http://testserver/api/patient-records/6fb17115-241f-44dd-a173-41258abb1eea "HTTP/1.1 405 Method Not Allowed"
+------------------------------ Captured log call ------------------------------
+WARNING  agentflow.access:middleware.py:35 [b9b9b06a] GET /api/patient-records/6fb17115-241f-44dd-a173-41258abb1eea 405 0.4ms
+INFO     httpx:_client.py:1740 HTTP Request: GET http://testserver/api/patient-records/6fb17115-241f-44dd-a173-41258abb1eea "HTTP/1.1 405 Method Not Allowed"
+___________________________ test_events_date_filter ___________________________
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 79, in collapse_excgroups
+  |     yield
+  |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 192, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\anyio\_backends\_asyncio.py", line 783, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\_pytest\runner.py", line 353, in from_call
+    |     result: TResult | None = func()
+    |                              ~~~~^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\_pytest\runner.py", line 245, in <lambda>
+    |     lambda: runtest_hook(item=item, **kwds),
+    |             ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_hooks.py", line 512, in __call__
+    |     return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+    |            ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_manager.py", line 120, in _hookexec
+    |     return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+    |            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 167, in _multicall
+    |     raise exception
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |     ~~~~~~~~~~~~~~^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\_pytest\logging.py", line 850, in pytest_runtest_call
+    |     yield
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |     ~~~~~~~~~~~~~~^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\_pytest\capture.py", line 900, in pytest_runtest_call
+    |     return (yield)
+    |             ^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |     ~~~~~~~~~~~~~~^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 53, in run_old_style_hookwrapper
+    |     return result.get_result()
+    |            ~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_result.py", line 103, in get_result
+    |     raise exc.with_traceback(tb)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 38, in run_old_style_hookwrapper
+    |     res = yield
+    |           ^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |     ~~~~~~~~~~~~~~^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\_pytest\skipping.py", line 268, in pytest_runtest_call
+    |     return (yield)
+    |             ^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 121, in _multicall
+    |     res = hook_impl.function(*args)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\_pytest\runner.py", line 179, in pytest_runtest_call
+    |     item.runtest()
+    |     ~~~~~~~~~~~~^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pytest_asyncio\plugin.py", line 469, in runtest
+    |     super().runtest()
+    |     ~~~~~~~~~~~~~~~^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\_pytest\python.py", line 1720, in runtest
+    |     self.ihook.pytest_pyfunc_call(pyfuncitem=self)
+    |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_hooks.py", line 512, in __call__
+    |     return self._hookexec(self.name, self._hookimpls.copy(), kwargs, firstresult)
+    |            ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_manager.py", line 120, in _hookexec
+    |     return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+    |            ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 167, in _multicall
+    |     raise exception
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 139, in _multicall
+    |     teardown.throw(exception)
+    |     ~~~~~~~~~~~~~~^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 53, in run_old_style_hookwrapper
+    |     return result.get_result()
+    |            ~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_result.py", line 103, in get_result
+    |     raise exc.with_traceback(tb)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 38, in run_old_style_hookwrapper
+    |     res = yield
+    |           ^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pluggy\_callers.py", line 121, in _multicall
+    |     res = hook_impl.function(*args)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\_pytest\python.py", line 166, in pytest_pyfunc_call
+    |     result = testfunction(**testargs)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\pytest_asyncio\plugin.py", line 716, in inner
+    |     runner.run(coro, context=context)
+    |     ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Program Files\Python313\Lib\asyncio\runners.py", line 118, in run
+    |     return self._loop.run_until_complete(task)
+    |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+    |   File "C:\Program Files\Python313\Lib\asyncio\base_events.py", line 720, in run_until_complete
+    |     return future.result()
+    |            ~~~~~~~~~~~~~^^
+    |   File "C:\Users\hp\Downloads\files (2)\test_agents.py", line 166, in test_events_date_filter
+    |     resp = await client.get(f"/api/appointments?start_from={tomorrow}")
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1768, in get
+    |     return await self.request(
+    |            ^^^^^^^^^^^^^^^^^^^
+    |     ...<9 lines>...
+    |     )
+    |     ^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1540, in request
+    |     return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1629, in send
+    |     response = await self._send_handling_auth(
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<4 lines>...
+    |     )
+    |     ^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1657, in _send_handling_auth
+    |     response = await self._send_handling_redirects(
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1694, in _send_handling_redirects
+    |     response = await self._send_single_request(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1730, in _send_single_request
+    |     response = await transport.handle_async_request(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_transports\asgi.py", line 170, in handle_async_request
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\applications.py", line 1159, in __call__
+    |     await super().__call__(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\applications.py", line 107, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |                                    ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 24, in dispatch
+    |     response: Response = await call_next(request)
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |                                    ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 50, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 716, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 736, in app
+    |     await route.handle(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 290, in handle
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 134, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 120, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 674, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\main.py", line 189, in list_events
+    |     events = await crud.get_events(
+    |              ^^^^^^^^^^^^^^^^^^^^^^
+    |         db, start_from=start_from, start_until=start_until, limit=limit
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\database\crud.py", line 166, in get_events
+    |     stmt = stmt.where(Appointment.start_time >= datetime.fromisoformat(start_from))
+    |                                                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+    | ValueError: Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\hp\Downloads\files (2)\test_agents.py", line 166, in test_events_date_filter
+    resp = await client.get(f"/api/appointments?start_from={tomorrow}")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1768, in get
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\httpx\_transports\asgi.py", line 170, in handle_async_request
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\applications.py", line 1159, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 24, in dispatch
+    response: Response = await call_next(request)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 674, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Downloads\files (2)\backend\main.py", line 189, in list_events
+    events = await crud.get_events(
+             ^^^^^^^^^^^^^^^^^^^^^^
+        db, start_from=start_from, start_until=start_until, limit=limit
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\hp\Downloads\files (2)\backend\database\crud.py", line 166, in get_events
+    stmt = stmt.where(Appointment.start_time >= datetime.fromisoformat(start_from))
+                                                ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+ValueError: Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+
+The above exception was the direct cause of the following exception:
+test_agents.py:166: in test_events_date_filter
+    resp = await client.get(f"/api/appointments?start_from={tomorrow}")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py:1768: in get
+    return await self.request(
+..\..\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py:1629: in send
+    response = await self._send_handling_auth(
+..\..\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+..\..\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\AppData\Roaming\Python\Python313\site-packages\httpx\_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\AppData\Roaming\Python\Python313\site-packages\httpx\_transports\asgi.py:170: in handle_async_request
+    await self.app(scope, receive, send)
+..\..\AppData\Roaming\Python\Python313\site-packages\fastapi\applications.py:1159: in __call__
+    await super().__call__(scope, receive, send)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\applications.py:107: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\errors.py:186: in __call__
+    raise exc
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\cors.py:85: in __call__
+    await self.app(scope, receive, send)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py:191: in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python313\Lib\contextlib.py:162: in __exit__
+    self.gen.throw(value)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py:85: in collapse_excgroups
+    raise exc
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\middleware.py:24: in dispatch
+    response: Response = await call_next(request)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py:191: in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ^^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python313\Lib\contextlib.py:162: in __exit__
+    self.gen.throw(value)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py:85: in collapse_excgroups
+    raise exc
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\middleware.py:50: in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\AppData\Roaming\Python\Python313\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py:716: in __call__
+    await self.middleware_stack(scope, receive, send)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py:736: in app
+    await route.handle(scope, receive, send)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py:290: in handle
+    await self.app(scope, receive, send)
+..\..\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py:134: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py:53: in wrapped_app
+    raise exc
+..\..\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+..\..\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py:120: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+..\..\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py:674: in app
+    raw_response = await run_endpoint_function(
+..\..\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py:328: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\main.py:189: in list_events
+    events = await crud.get_events(
+backend\database\crud.py:166: in get_events
+    stmt = stmt.where(Appointment.start_time >= datetime.fromisoformat(start_from))
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+---------------------------- Captured stderr call -----------------------------
+2026-04-06 22:55:49 | INFO     | agentflow.access | [4eaeadf0] POST /api/appointments 201 3.8ms
+2026-04-06 22:55:49 | INFO     | httpx | HTTP Request: POST http://testserver/api/appointments "HTTP/1.1 201 Created"
+2026-04-06 22:55:49 | ERROR    | agentflow.access | [998f51c6] GET /api/appointments ERROR 1.3ms — Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+2026-04-06 22:55:49 | ERROR    | agentflow.errors | Unhandled error on /api/appointments: Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 79, in collapse_excgroups
+  |     yield
+  |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 192, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\anyio\_backends\_asyncio.py", line 783, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |                                    ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 24, in dispatch
+    |     response: Response = await call_next(request)
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |                                    ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 50, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 716, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 736, in app
+    |     await route.handle(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 290, in handle
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 134, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 120, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 674, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\main.py", line 189, in list_events
+    |     events = await crud.get_events(
+    |              ^^^^^^^^^^^^^^^^^^^^^^
+    |         db, start_from=start_from, start_until=start_until, limit=limit
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\database\crud.py", line 166, in get_events
+    |     stmt = stmt.where(Appointment.start_time >= datetime.fromisoformat(start_from))
+    |                                                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+    | ValueError: Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 24, in dispatch
+    response: Response = await call_next(request)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 674, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Downloads\files (2)\backend\main.py", line 189, in list_events
+    events = await crud.get_events(
+             ^^^^^^^^^^^^^^^^^^^^^^
+        db, start_from=start_from, start_until=start_until, limit=limit
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\hp\Downloads\files (2)\backend\database\crud.py", line 166, in get_events
+    stmt = stmt.where(Appointment.start_time >= datetime.fromisoformat(start_from))
+                                                ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+ValueError: Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+------------------------------ Captured log call ------------------------------
+INFO     agentflow.access:middleware.py:35 [4eaeadf0] POST /api/appointments 201 3.8ms
+INFO     httpx:_client.py:1740 HTTP Request: POST http://testserver/api/appointments "HTTP/1.1 201 Created"
+ERROR    agentflow.access:middleware.py:27 [998f51c6] GET /api/appointments ERROR 1.3ms — Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+ERROR    agentflow.errors:exceptions.py:77 Unhandled error on /api/appointments: Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+  + Exception Group Traceback (most recent call last):
+  |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 79, in collapse_excgroups
+  |     yield
+  |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 192, in __call__
+  |     async with anyio.create_task_group() as task_group:
+  |                ~~~~~~~~~~~~~~~~~~~~~~~^^
+  |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\anyio\_backends\_asyncio.py", line 783, in __aexit__
+  |     raise BaseExceptionGroup(
+  |         "unhandled errors in a TaskGroup", self._exceptions
+  |     ) from None
+  | ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    |     await self.app(scope, receive, _send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |                                    ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 24, in dispatch
+    |     response: Response = await call_next(request)
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    |     with recv_stream, send_stream, collapse_excgroups():
+    |                                    ~~~~~~~~~~~~~~~~~~^^
+    |   File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    |     self.gen.throw(value)
+    |     ~~~~~~~~~~~~~~^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    |     response = await self.dispatch_func(request, call_next)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 50, in dispatch
+    |     response = await call_next(request)
+    |                ^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    |     raise app_exc from app_exc.__cause__ or app_exc.__context__
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    |     await self.app(scope, receive_or_disconnect, send_no_error)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 716, in __call__
+    |     await self.middleware_stack(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 736, in app
+    |     await route.handle(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 290, in handle
+    |     await self.app(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 134, in app
+    |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    |     raise exc
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    |     await app(scope, receive, sender)
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 120, in app
+    |     response = await f(request)
+    |                ^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 674, in app
+    |     raw_response = await run_endpoint_function(
+    |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     ...<3 lines>...
+    |     )
+    |     ^
+    |   File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    |     return await dependant.call(**values)
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\main.py", line 189, in list_events
+    |     events = await crud.get_events(
+    |              ^^^^^^^^^^^^^^^^^^^^^^
+    |         db, start_from=start_from, start_until=start_until, limit=limit
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |     )
+    |     ^
+    |   File "C:\Users\hp\Downloads\files (2)\backend\database\crud.py", line 166, in get_events
+    |     stmt = stmt.where(Appointment.start_time >= datetime.fromisoformat(start_from))
+    |                                                 ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+    | ValueError: Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 24, in dispatch
+    response: Response = await call_next(request)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 191, in __call__
+    with recv_stream, send_stream, collapse_excgroups():
+                                   ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Program Files\Python313\Lib\contextlib.py", line 162, in __exit__
+    self.gen.throw(value)
+    ~~~~~~~~~~~~~~^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Downloads\files (2)\backend\middleware.py", line 50, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\middleware\asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 674, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\hp\AppData\Roaming\Python\Python313\site-packages\fastapi\routing.py", line 328, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hp\Downloads\files (2)\backend\main.py", line 189, in list_events
+    events = await crud.get_events(
+             ^^^^^^^^^^^^^^^^^^^^^^
+        db, start_from=start_from, start_until=start_until, limit=limit
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\hp\Downloads\files (2)\backend\database\crud.py", line 166, in get_events
+    stmt = stmt.where(Appointment.start_time >= datetime.fromisoformat(start_from))
+                                                ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+ValueError: Invalid isoformat string: '2026-04-07T17:25:49.435303 00:00'
+______________________ test_invalid_task_id_returns_404 _______________________
+test_agents.py:176: in test_invalid_task_id_returns_404
+    assert resp.status_code == 404
+E   assert 405 == 404
+E    +  where 405 = <Response [405 Method Not Allowed]>.status_code
+---------------------------- Captured stderr call -----------------------------
+2026-04-06 22:55:49 | WARNING  | agentflow.access | [783fa3fa] GET /api/clinical-tasks/00000000-0000-0000-0000-000000000000 405 0.4ms
+2026-04-06 22:55:49 | INFO     | httpx | HTTP Request: GET http://testserver/api/clinical-tasks/00000000-0000-0000-0000-000000000000 "HTTP/1.1 405 Method Not Allowed"
+------------------------------ Captured log call ------------------------------
+WARNING  agentflow.access:middleware.py:35 [783fa3fa] GET /api/clinical-tasks/00000000-0000-0000-0000-000000000000 405 0.4ms
+INFO     httpx:_client.py:1740 HTTP Request: GET http://testserver/api/clinical-tasks/00000000-0000-0000-0000-000000000000 "HTTP/1.1 405 Method Not Allowed"
+=========================== short test summary info ===========================
+FAILED test_agents.py::test_task_full_lifecycle - KeyError: 'title'
+FAILED test_agents.py::test_event_full_lifecycle - KeyError: 'patient_name'
+FAILED test_agents.py::test_note_full_lifecycle - KeyError: 'patient_name'
+FAILED test_agents.py::test_events_date_filter - ValueError: Invalid isoforma...
+FAILED test_agents.py::test_invalid_task_id_returns_404 - assert 405 == 404
+========================= 5 failed, 7 passed in 1.23s =========================

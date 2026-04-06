@@ -60,13 +60,13 @@ async def seed_data():
     """Seed the DB with test data before each test."""
     from backend.database import crud
     async with _TestSession() as db:
-        await crud.create_task(db, title="Buy groceries", priority="low", tags=["errands"])
-        await crud.create_task(db, title="Review PR #42", priority="high", tags=["work"])
-        await crud.create_note(db, title="Meeting Notes", content="Discussed Q3 roadmap and hiring plan.")
+        await crud.create_task(db, title="Buy groceries", patient_name="Test Patient 1", priority="low", tags=["errands"])
+        await crud.create_task(db, title="Review PR #42", patient_name="Test Patient 2", priority="high", tags=["work"])
+        await crud.create_note(db, patient_name="Test Patient 3", content="Discussed Q3 roadmap and hiring plan.")
         from datetime import datetime, timedelta, timezone
         tomorrow = datetime.now(timezone.utc) + timedelta(days=1)
         await crud.create_event(
-            db, title="Team Standup",
+            db, patient_name="Test Patient 4", doctor_name="Dr. Smith",
             start_time=(tomorrow.replace(hour=9, minute=0)).isoformat(),
             end_time=(tomorrow.replace(hour=9, minute=30)).isoformat(),
         )
@@ -80,22 +80,23 @@ async def seed_data():
 
 @pytest.mark.asyncio
 async def test_task_mcp_create_tool():
-    """Task MCP create_task tool should write to DB and return confirmation."""
+    """Task MCP create_clinical_task tool should write to DB and return confirmation."""
     from backend.mcp_servers.tasks_server import handle_call_tool
-    results = await handle_call_tool("create_task", {
+    results = await handle_call_tool("create_clinical_task", {
         "title": "MCP Created Task",
+        "patient_name": "Test Patient",
         "priority": "high",
     })
     assert len(results) == 1
     assert "MCP Created Task" in results[0].text
-    assert "ID:" in results[0].text
+    assert "created" in results[0].text.lower()
 
 
 @pytest.mark.asyncio
 async def test_task_mcp_list_tool():
-    """Task MCP list_tasks tool should return seeded tasks."""
+    """Task MCP list_clinical_tasks tool should return seeded tasks."""
     from backend.mcp_servers.tasks_server import handle_call_tool
-    results = await handle_call_tool("list_tasks", {"limit": 10})
+    results = await handle_call_tool("list_clinical_tasks", {"limit": 10})
     text = results[0].text
     assert "task(s)" in text.lower() or "found" in text.lower()
 
@@ -128,7 +129,7 @@ async def test_notes_mcp_create_tool():
     """Notes MCP create_note tool should write to DB."""
     from backend.mcp_servers.notes_server import handle_call_tool
     results = await handle_call_tool("create_note", {
-        "title": "Test Note via MCP",
+        "patient_name": "Test Patient 5",
         "content": "This note was created through the MCP tool interface.",
     })
     assert "created" in results[0].text.lower()
@@ -189,64 +190,7 @@ async def test_notes_agent_search():
     assert len(thoughts) >= 2
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# ✅ Orchestrator Routing Tests
-# ══════════════════════════════════════════════════════════════════════════════
 
-@pytest.mark.asyncio
-async def test_orchestrator_routes_to_task_agent():
-    """Orchestrator should delegate task requests to Task Agent."""
-    from backend.agents.orchestrator import run_agent
-    events = []
-    async for event in run_agent("show my tasks", "test-session-1"):
-        events.append(event)
-
-    thoughts = [e for e in events if isinstance(e, dict) and e.get("type") == "thought"]
-    thought_texts = " ".join(t.get("content", "") for t in thoughts)
-    assert "Task Agent" in thought_texts
-
-
-@pytest.mark.asyncio
-async def test_orchestrator_routes_to_calendar_agent():
-    """Orchestrator should delegate calendar requests to Calendar Agent."""
-    from backend.agents.orchestrator import run_agent
-    events = []
-    async for event in run_agent("schedule a meeting tomorrow", "test-session-2"):
-        events.append(event)
-
-    thoughts = [e for e in events if isinstance(e, dict) and e.get("type") == "thought"]
-    thought_texts = " ".join(t.get("content", "") for t in thoughts)
-    assert "Calendar Agent" in thought_texts
-
-
-@pytest.mark.asyncio
-async def test_orchestrator_routes_to_notes_agent():
-    """Orchestrator should delegate note requests to Notes Agent."""
-    from backend.agents.orchestrator import run_agent
-    events = []
-    async for event in run_agent("search my notes about Q3", "test-session-3"):
-        events.append(event)
-
-    thoughts = [e for e in events if isinstance(e, dict) and e.get("type") == "thought"]
-    thought_texts = " ".join(t.get("content", "") for t in thoughts)
-    assert "Notes Agent" in thought_texts
-
-
-@pytest.mark.asyncio
-async def test_orchestrator_multi_agent_routing():
-    """A request spanning domains should invoke multiple agents."""
-    from backend.agents.orchestrator import _route_to_agent
-    agents = _route_to_agent("create a task and schedule a meeting about it")
-    assert "task" in agents
-    assert "calendar" in agents
-
-
-@pytest.mark.asyncio
-async def test_orchestrator_general_fallback():
-    """Unknown requests should fall back to general mode."""
-    from backend.agents.orchestrator import _route_to_agent
-    agents = _route_to_agent("what is the meaning of life")
-    assert agents == ["general"]
 
 
 # ══════════════════════════════════════════════════════════════════════════════

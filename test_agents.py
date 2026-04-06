@@ -75,24 +75,24 @@ async def test_task_full_lifecycle(client, sample_task):
     task_id = sample_task["id"]
 
     # Read
-    resp = await client.get(f"/api/tasks/{task_id}")
+    resp = await client.get(f"/api/clinical-tasks/{task_id}")
     assert resp.json()["title"] == "Sample Task"
 
     # Mark in_progress
-    resp = await client.put(f"/api/tasks/{task_id}", json={"status": "in_progress"})
+    resp = await client.put(f"/api/clinical-tasks/{task_id}", json={"status": "in_progress"})
     assert resp.json()["status"] == "in_progress"
 
     # Mark done
-    resp = await client.put(f"/api/tasks/{task_id}", json={"status": "done"})
+    resp = await client.put(f"/api/clinical-tasks/{task_id}", json={"status": "done"})
     assert resp.json()["status"] == "done"
     assert resp.json()["completed_at"] is not None  # timestamp set
 
     # Delete
-    resp = await client.delete(f"/api/tasks/{task_id}")
+    resp = await client.delete(f"/api/clinical-tasks/{task_id}")
     assert resp.json()["success"] is True
 
     # Confirm gone
-    resp = await client.get(f"/api/tasks/{task_id}")
+    resp = await client.get(f"/api/clinical-tasks/{task_id}")
     assert resp.status_code == 404
 
 
@@ -101,13 +101,13 @@ async def test_event_full_lifecycle(client, sample_event):
     """Create → Read → Update location → Delete."""
     eid = sample_event["id"]
 
-    resp = await client.get(f"/api/events/{eid}")
-    assert resp.json()["title"] == "Sample Event"
+    resp = await client.get(f"/api/appointments/{eid}")
+    assert resp.json()["patient_name"] == "Test Patient"
 
-    resp = await client.put(f"/api/events/{eid}", json={"location": "Google Meet"})
+    resp = await client.put(f"/api/appointments/{eid}", json={"location": "Google Meet"})
     assert resp.json()["location"] == "Google Meet"
 
-    resp = await client.delete(f"/api/events/{eid}")
+    resp = await client.delete(f"/api/appointments/{eid}")
     assert resp.json()["success"] is True
 
 
@@ -116,34 +116,34 @@ async def test_note_full_lifecycle(client, sample_note):
     """Create → Read → Pin → Search → Delete."""
     nid = sample_note["id"]
 
-    resp = await client.get(f"/api/notes/{nid}")
-    assert resp.json()["title"] == "Sample Note"
+    resp = await client.get(f"/api/patient-records/{nid}")
+    assert resp.json()["patient_name"] == "Test Patient"
 
     # Pin the note
-    resp = await client.put(f"/api/notes/{nid}", json={"is_pinned": True})
+    resp = await client.put(f"/api/patient-records/{nid}", json={"is_pinned": True})
     assert resp.json()["is_pinned"] is True
 
     # Should appear in pinned list
-    resp = await client.get("/api/notes?pinned_only=true")
+    resp = await client.get("/api/patient-records?pinned_only=true")
     ids = [n["id"] for n in resp.json()["notes"]]
     assert nid in ids
 
     # Search
-    resp = await client.get("/api/notes?search=sample+note+content")
+    resp = await client.get("/api/patient-records?search=sample+note+content")
     assert resp.json()["count"] >= 1
 
     # Delete
-    resp = await client.delete(f"/api/notes/{nid}")
+    resp = await client.delete(f"/api/patient-records/{nid}")
     assert resp.json()["success"] is True
 
 
 @pytest.mark.asyncio
 async def test_task_priority_filter(client):
     """Filter tasks by priority should only return matching tasks."""
-    await client.post("/api/tasks", json={"title": "High P Task", "priority": "high"})
-    await client.post("/api/tasks", json={"title": "Low P Task", "priority": "low"})
+    await client.post("/api/clinical-tasks", json={"title": "High P Task", "patient_name": "Test Patient", "priority": "high"})
+    await client.post("/api/clinical-tasks", json={"title": "Low P Task", "patient_name": "Test Patient", "priority": "low"})
 
-    resp = await client.get("/api/tasks?priority=high")
+    resp = await client.get("/api/clinical-tasks?priority=high")
     tasks = resp.json()["tasks"]
     assert all(t["priority"] == "high" for t in tasks)
 
@@ -155,15 +155,15 @@ async def test_events_date_filter(client):
 
     # Create future event
     future = datetime.now(timezone.utc) + timedelta(days=10)
-    await client.post("/api/events", json={
-        "title": "Future Event",
+    await client.post("/api/appointments", json={
+        "patient_name": "Future Event", "doctor_name": "Dr Test",
         "start_time": future.isoformat(),
         "end_time": (future + timedelta(hours=1)).isoformat(),
     })
 
     # Filter from tomorrow onwards
     tomorrow = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
-    resp = await client.get(f"/api/events?start_from={tomorrow}")
+    resp = await client.get(f"/api/appointments?start_from={tomorrow}")
     assert resp.status_code == 200
     events = resp.json()["events"]
     assert all(e["start_time"] >= tomorrow for e in events)
@@ -172,12 +172,12 @@ async def test_events_date_filter(client):
 @pytest.mark.asyncio
 async def test_invalid_task_id_returns_404(client):
     fake_id = "00000000-0000-0000-0000-000000000000"
-    resp = await client.get(f"/api/tasks/{fake_id}")
+    resp = await client.get(f"/api/clinical-tasks/{fake_id}")
     assert resp.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_missing_required_fields(client):
     """Creating a task without title should fail validation."""
-    resp = await client.post("/api/tasks", json={"priority": "high"})
+    resp = await client.post("/api/clinical-tasks", json={"priority": "high"})
     assert resp.status_code == 422  # Unprocessable Entity

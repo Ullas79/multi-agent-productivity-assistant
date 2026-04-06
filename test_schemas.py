@@ -8,9 +8,9 @@ from pydantic import ValidationError
 
 from backend.schemas import (
     ChatRequest,
-    TaskCreate, TaskUpdate,
-    EventCreate, EventUpdate,
-    NoteCreate, NoteUpdate,
+    ClinicalTaskCreate, ClinicalTaskUpdate,
+    AppointmentCreate, AppointmentUpdate,
+    PatientRecordCreate, PatientRecordUpdate,
 )
 
 
@@ -36,86 +36,76 @@ def test_chat_request_no_session_defaults_none():
     assert req.session_id is None
 
 
-# ── TaskCreate ────────────────────────────────────────────────────────────────
+# ── ClinicalTaskCreate ────────────────────────────────────────────────────────
 
 def test_task_create_valid():
-    t = TaskCreate(title="My Task", priority="high", tags=["work", "urgent"])
+    t = ClinicalTaskCreate(title="My Task", patient_name="John Doe", priority="high", tags=["work", "urgent"])
     assert t.title == "My Task"
     assert t.priority == "high"
     assert "work" in t.tags
 
 
 def test_task_create_tags_normalised():
-    t = TaskCreate(title="T", tags=["  WORK  ", "Urgent", ""])
+    t = ClinicalTaskCreate(title="T", tags=["  WORK  ", "Urgent", ""])
     assert t.tags == ["work", "urgent"]  # stripped, lowercased, empty removed
 
 
 def test_task_create_invalid_priority():
     with pytest.raises(ValidationError):
-        TaskCreate(title="T", priority="critical")
+        ClinicalTaskCreate(title="T", priority="critical")
 
 
 def test_task_create_empty_title_fails():
     with pytest.raises(ValidationError):
-        TaskCreate(title="")
+        ClinicalTaskCreate(title="")
 
 
 def test_task_update_all_optional():
-    u = TaskUpdate()
+    u = ClinicalTaskUpdate()
     assert u.title is None
     assert u.status is None
 
 
 def test_task_update_invalid_status():
     with pytest.raises(ValidationError):
-        TaskUpdate(status="pending")
+        ClinicalTaskUpdate(status="pending")
 
 
-# ── EventCreate ───────────────────────────────────────────────────────────────
+# ── AppointmentCreate ─────────────────────────────────────────────────────────
 
 def test_event_create_valid():
     start = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
     end = (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
-    e = EventCreate(title="Meeting", start_time=start, end_time=end)
-    assert e.title == "Meeting"
+    e = AppointmentCreate(patient_name="John", doctor_name="Dr. Smith", start_time=start, end_time=end)
+    assert e.patient_name == "John"
 
 
 def test_event_create_end_before_start_fails():
     start = (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
     end = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
     with pytest.raises(ValidationError):
-        EventCreate(title="Bad", start_time=start, end_time=end)
+        AppointmentCreate(patient_name="John", doctor_name="Dr. Smith", start_time=start, end_time=end)
 
 
-def test_event_create_attendees_normalised():
-    start = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
-    end = (datetime.now(timezone.utc) + timedelta(hours=2)).isoformat()
-    e = EventCreate(
-        title="T", start_time=start, end_time=end,
-        attendees=["Alice@Test.COM", " bob@test.com "],
-    )
-    assert e.attendees == ["alice@test.com", "bob@test.com"]
-
-
-# ── NoteCreate ────────────────────────────────────────────────────────────────
+# ── PatientRecordCreate ───────────────────────────────────────────────────────
 
 def test_note_create_valid():
-    n = NoteCreate(title="My Note", content="Some content", is_pinned=True)
+    n = PatientRecordCreate(patient_name="John", content="Some content", is_pinned=True)
     assert n.is_pinned is True
 
 
 def test_note_create_empty_content_fails():
     with pytest.raises(ValidationError):
-        NoteCreate(title="T", content="")
+        PatientRecordCreate(patient_name="John", content="")
 
 
 def test_note_create_tags_normalised():
-    n = NoteCreate(title="T", content="c", tags=["Tag1", " TAG2 ", ""])
+    n = PatientRecordCreate(patient_name="John", content="c", tags=["Tag1", " TAG2 ", ""])
     assert n.tags == ["tag1", "tag2"]
 
 
 def test_note_update_all_optional():
-    u = NoteUpdate()
-    assert u.title is None
+    u = PatientRecordUpdate()
+    assert u.patient_name is None
     assert u.content is None
     assert u.is_pinned is None

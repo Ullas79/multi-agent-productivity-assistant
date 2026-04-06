@@ -13,6 +13,7 @@ import asyncio
 import logging
 from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+import threading
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ engine = None
 AsyncSessionLocal = None
 
 _initialised = False
-_init_lock = asyncio.Lock()
+_init_lock = threading.Lock()
 
 
 def _create_default_engine():
@@ -31,68 +32,72 @@ def _create_default_engine():
     global engine, AsyncSessionLocal, _initialised
     if _initialised:
         return
-    _initialised = True
+        
+    with _init_lock:
+        if _initialised:
+            return
 
-    try:
-        from sqlalchemy.ext.asyncio import create_async_engine
-        from backend.config import get_settings
+        try:
+            from sqlalchemy.ext.asyncio import create_async_engine
+            from backend.config import get_settings
 
-        settings = get_settings()
+            settings = get_settings()
 
-        if settings.use_sqlite:
-            # Local dev mode – no PostgreSQL needed
-            DATABASE_URL = "sqlite+aiosqlite:///agentflow.db"
-            logger.info("Using SQLite database (local dev mode)")
-            engine = create_async_engine(
-                DATABASE_URL,
-                echo=False,
-                connect_args={"check_same_thread": False},
-            )
-        elif getattr(settings, "alloydb_instance", ""):
-            # Cloud Run production – AlloyDB via Connector with IAM auth
-            logger.info("Using AlloyDB via Connector (Cloud Run mode)")
-            try:
-                from google.cloud.alloydb.connector import AsyncConnector
-
-                connector = AsyncConnector()
-
-                async def getconn():
-                    return await connector.connect(
-                        settings.alloydb_instance,
-                        "asyncpg",
-                        user=settings.db_user,
-                        db=settings.db_name,
-                        enable_iam_auth=getattr(settings, "alloydb_iam_auth", True),
-                    )
-
+            if settings.use_sqlite:
+                # Local dev mode – no PostgreSQL needed
+                DATABASE_URL = "sqlite+aiosqlite:///agentflow.db"
+                logger.info("Using SQLite database (local dev mode)")
                 engine = create_async_engine(
-                    "postgresql+asyncpg://",
-                    async_creator=getconn,
+                    DATABASE_URL,
                     echo=False,
-                    pool_size=5,       # Cloud Run has limited connections
-                    max_overflow=10,
-                    pool_pre_ping=True,  # Handle connection drops on scale-to-zero
-                    pool_recycle=1800,   # Recycle connections every 30 min
+                    connect_args={"check_same_thread": False},
                 )
-            except ImportError:
-                logger.warning(
-                    "google-cloud-alloydb-connector not installed, "
-                    "falling back to direct PostgreSQL connection"
-                )
-                _create_direct_pg_engine(settings)
-        else:
-            # Direct PostgreSQL connection (staging / custom setup)
-            _create_direct_pg_engine(settings)
+            elif getattr(settings, "alloydb_instance", ""):
+                # Cloud Run production – AlloyDB via Connector with IAM auth
+                logger.info("Using AlloyDB via Connector (Cloud Run mode)")
+                try:
+                    from google.cloud.alloydb.connector import AsyncConnector
 
-        AsyncSessionLocal = async_sessionmaker(
-            bind=engine,
-            class_=AsyncSession,
-            expire_on_commit=False,
-            autoflush=False,
-        )
-    except Exception as e:
-        logger.error("Failed to create database engine: %s", e)
-        raise
+                    connector = AsyncConnector()
+
+                    async def getconn():
+                        return await connector.connect(
+                            settings.alloydb_instance,
+                            "asyncpg",
+                            user=settings.db_user,
+                            db=settings.db_name,
+                            enable_iam_auth=getattr(settings, "alloydb_iam_auth", True),
+                        )
+
+                    engine = create_async_engine(
+                        "postgresql+asyncpg://",
+                        async_creator=getconn,
+                        echo=False,
+                        pool_size=5,       # Cloud Run has limited connections
+                        max_overflow=10,
+                        pool_pre_ping=True,  # Handle connection drops on scale-to-zero
+                        pool_recycle=1800,   # Recycle connections every 30 min
+                    )
+                except ImportError:
+                    logger.warning(
+                        "google-cloud-alloydb-connector not installed, "
+                        "falling back to direct PostgreSQL connection"
+                    )
+                    _create_direct_pg_engine(settings)
+            else:
+                # Direct PostgreSQL connection (staging / custom setup)
+                _create_direct_pg_engine(settings)
+
+            AsyncSessionLocal = async_sessionmaker(
+                bind=engine,
+                class_=AsyncSession,
+                expire_on_commit=False,
+                autoflush=False,
+            )
+            _initialised = True
+        except Exception as e:
+            logger.error("Failed to create database engine: %s", e)
+            raise
 
 
 def _create_direct_pg_engine(settings):
@@ -122,8 +127,14 @@ def _create_direct_pg_engine(settings):
 
 def _ensure_engine():
     """Ensure the engine is initialised; called by public functions."""
-    if engine is None and not _initialised:
+    if not _initialised:
         _create_default_engine()
+
+
+def get_session_factory():
+    """Ensure engine is initialised and return the session factory."""
+    _ensure_engine()
+    return AsyncSessionLocal
 
 
 async def init_db():

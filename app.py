@@ -6,7 +6,7 @@ import requests
 import streamlit as st
 
 # Configuration
-API_URL = "http://localhost:8080/api/chat"
+API_URL = "http://localhost:8000/api/chat"
 
 st.set_page_config(page_title="AgentFlow HMS", page_icon="🏥", layout="wide")
 
@@ -103,4 +103,4 @@ if prompt := st.chat_input("Ask the Hospital Orchestrator..."):
 
             except Exception:
                 status.update(label="API Error", state="error")
-                st.error("Make sure your FastAPI backend is running on port 8080!")
+                st.error("Make sure your FastAPI backend is running on port 8000!")

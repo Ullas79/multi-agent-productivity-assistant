@@ -115,7 +115,7 @@ async def run(
             "start_time": tool_args["start_time"],
             "end_time": tool_args["end_time"],
         })
-        avail_output = avail_results[0].text
+        avail_output = avail_results[0].text if avail_results else "No output"
 
         if "CONFLICT" in avail_output:
             yield {"type": "thought", "content": "⚠️ Schedule conflict detected!"}
@@ -124,13 +124,14 @@ async def run(
         else:
             yield {"type": "thought", "content": "✅ Time slot is clear – creating event..."}
             create_results = await calendar_tool("create_event", tool_args)
-            tool_output = f"Availability: {avail_output}\n\n{create_results[0].text}"
+            create_out = create_results[0].text if create_results else "No output"
+            tool_output = f"Availability: {avail_output}\n\n{create_out}"
             yield {"type": "thought", "content": "✅ Event created successfully!"}
 
     else:
         yield {"type": "thought", "content": f"🔧 Calling MCP tool: {tool_name}"}
         results = await calendar_tool(tool_name, tool_args)
-        tool_output = results[0].text
+        tool_output = results[0].text if results else "No output"
         yield {"type": "thought", "content": "✅ Calendar data retrieved."}
 
     # Use shared LLM streaming utility

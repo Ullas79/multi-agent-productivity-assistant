@@ -11,14 +11,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install streamlit requests
 
 # Copy application code
-COPY backend/ backend/
-COPY frontend/ frontend/
-COPY entrypoint.sh .
+COPY . .
 
-RUN chmod +x entrypoint.sh
+RUN chmod +x start.sh
 
-EXPOSE 8080
-
-CMD ["./entrypoint.sh"]
+ENV PORT=8080
+CMD ["./start.sh"]
