@@ -1,0 +1,14 @@
+# requirements.txt – AgentFlow production dependencies
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic-settings>=2.0.0
+google-cloud-aiplatform>=1.43.0
+langchain-google-vertexai>=0.1.0
+sqlalchemy[asyncio]>=2.0.0
+asyncpg>=0.29.0
+pgvector>=0.2.5
+mcp>=0.1.0
+aiosqlite>=0.20.0
+httptools
+uvloop; sys_platform != "win32"
+psycopg2-binary>=2.9.0

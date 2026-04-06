@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentFlow - Multi-Agent AI</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f1f5f9;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #1e293b;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: #3b82f6;
+            color: white;
+            border-bottom-right-radius: 0;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background-color: white;
+            color: #334155;
+            border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 85%;
+        }
+
+        /* Thought Process Styles (Phase 2 UI Wow Factor) */
+        .thought-process-container {
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border-radius: 0 8px 8px 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .thought-step {
+            opacity: 0;
+            animation: fadeIn 0.4s forwards;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .thought-step.active::before {
+            content: "↻";
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+
+        .thought-step.completed::before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .final-text {
+            white-space: pre-wrap;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        .chat-input-container {
+            display: flex;
+            padding: 15px 20px;
+            background-color: white;
+            border-top: 1px solid #e2e8f0;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: #3b82f6;
+        }
+
+        .send-button {
+            padding: 12px 24px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .send-button:hover {
+            background-color: #2563eb;
+        }
+        
+        .send-button:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">
+        🤖 AgentFlow Orchestrator
+    </div>
+    <div class="chat-box" id="chatBox">
+        <div class="message ai-message">
+            <div class="final-text">Hello! I am your Enterprise AI Assistant. How can I help you manage your tasks, schedule, or notes today?</div>
+        </div>
+    </div>
+    <div class="chat-input-container">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Type your request... e.g. 'Schedule a meeting tomorrow'" />
+        <button class="send-button" id="sendBtn">Send</button>
+    </div>
+</div>
+
+<script>
+    const chatBox = document.getElementById('chatBox');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    let currentSessionId = null;
+
+    function appendUserMessage(text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message user-message';
+        msgDiv.textContent = text;
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        appendUserMessage(text);
+        chatInput.value = '';
+        sendBtn.disabled = true;
+
+        // Container for AI Response
+        const responseContainer = document.createElement('div');
+        responseContainer.className = 'message ai-message';
+        chatBox.appendChild(responseContainer);
+
+        // Container for Agent's thoughts
+        const thoughtContainer = document.createElement('div');
+        thoughtContainer.className = 'thought-process-container';
+        thoughtContainer.style.display = 'none';
+        responseContainer.appendChild(thoughtContainer);
+
+        // Container for actual output text
+        const textContainer = document.createElement('div');
+        textContainer.className = 'final-text';
+        responseContainer.appendChild(textContainer);
+
+        let currentThoughtElement = null;
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, session_id: currentSessionId })
+            });
+
+            if (!response.body) throw new Error("ReadableStream not supported");
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+            let done = false;
+
+            while (!done) {
+                const { value, done: readerDone } = await reader.read();
+                done = readerDone;
+                if (value) {
+                    const chunkStr = decoder.decode(value, { stream: true });
+                    const events = chunkStr.split('\n\n');
+                    
+                    for (const event of events) {
+                        if (!event.startsWith('data: ')) continue;
+                        try {
+                            const data = JSON.parse(event.substring(6));
+                            
+                            if (data.type === 'session_id') {
+                                currentSessionId = data.session_id;
+                            } 
+                            else if (data.type === 'thought') {
+                                thoughtContainer.style.display = 'block';
+                                
+                                if (currentThoughtElement) {
+                                    currentThoughtElement.classList.remove('active');
+                                    currentThoughtElement.classList.add('completed');
+                                }
+                                
+                                currentThoughtElement = document.createElement('div');
+                                currentThoughtElement.className = 'thought-step active';
+                                currentThoughtElement.textContent = data.content;
+                                thoughtContainer.appendChild(currentThoughtElement);
+                                chatBox.scrollTop = chatBox.scrollHeight;
+                            } 
+                            else if (data.type === 'text') {
+                                if (currentThoughtElement && currentThoughtElement.classList.contains('active')) {
+                                    currentThoughtElement.classList.remove('active');
+                                    currentThoughtElement.classList.add('completed');
+                                }
+                                textContainer.textContent += data.content;
+                                chatBox.scrollTop = chatBox.scrollHeight;
+                            }
+                            else if (data.type === 'done') {
+                                if (currentThoughtElement && currentThoughtElement.classList.contains('active')) {
+                                    currentThoughtElement.classList.remove('active');
+                                    currentThoughtElement.classList.add('completed');
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Error parsing event data:", e, event);
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            textContainer.textContent += "\n[Error communicating with server]";
+            console.error(error);
+        } finally {
+            sendBtn.disabled = false;
+            chatInput.focus();
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+</script>
+</body>
+</html>

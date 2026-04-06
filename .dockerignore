@@ -1,0 +1,64 @@
+# .dockerignore – exclude everything not needed in the container
+
+# Version control
+.git
+.gitignore
+.github
+
+# Python junk
+__pycache__
+*.py[cod]
+*.pyo
+*.egg-info
+.eggs
+dist
+build
+.tox
+.coverage
+htmlcov
+.pytest_cache
+*.cover
+
+# Virtual envs
+.venv
+venv
+env
+.env
+
+# Dev tools
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Docs & scripts (not needed at runtime)
+README.md
+docs/
+*.md
+
+# Local dev
+docker-compose.yml
+setup_local.sh
+deploy.sh
+
+# Secrets (never bake into image)
+.env
+*.pem
+*.key
+service-account*.json
+
+# Test files
+tests/
+test_*.py
+conftest.py
+pytest.ini
+
+# Logs
+*.log
+logs/
+
+# DB data
+pgdata/
+postgres-data/
+agentflow.db
