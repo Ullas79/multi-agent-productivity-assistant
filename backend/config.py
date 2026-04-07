@@ -1,7 +1,9 @@
 """
 backend/config.py – Application settings loaded from environment / .env file.
 """
+
 from functools import lru_cache
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,7 +17,7 @@ class Settings(BaseSettings):
     # GCP / Vertex AI Settings
     google_cloud_project: str = ""
     google_cloud_region: str = "us-central1"
-    gemini_model: str = "gemini-2.0-flash-exp"
+    gemini_model: str = "gemini-2.5-flash"
     google_api_key: str = ""
 
     # Database settings
