@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     db_user: str = "agentflow"
     db_password: str = ""
     db_name: str = "agentflow"
+    
+    # AlloyDB settings
+    alloydb_instance: str | None = None
+    alloydb_iam_auth: bool = True
+    
     # Set USE_SQLITE=true for local dev without PostgreSQL
     use_sqlite: bool = False
 

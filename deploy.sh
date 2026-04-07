@@ -1,77 +1,53 @@
 #!/bin/bash
-# =============================================================================
-# deploy.sh – Build and deploy AgentFlow to Cloud Run
-# =============================================================================
+# deploy.sh - Builds and deploys the AgentFlow app to Google Cloud Run
 
-set -euo pipefail
-CYAN='\033[0;36m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; NC='\033[0m'
+set -e
 
-# ── Get project info ──────────────────────────────────────────────────────────
-PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project 2>/dev/null)}"
-REGION="${GOOGLE_CLOUD_REGION:-us-central1}"
-SERVICE_NAME="agentflow"
-AR_REPO="agentflow-repo"
-IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE_NAME}"
+# Default settings
+PROJECT_ID=$(gcloud config get-value project)
+REGION="us-central1"
+SERVICE_NAME="agentflow-app"
+IMAGE_NAME="gcr.io/$PROJECT_ID/$SERVICE_NAME"
+NETWORK="default"
+CLUSTER_ID="my-alloydb-cluster"
+INSTANCE_ID="my-primary-instance"
 
-if [ -z "$PROJECT_ID" ]; then
-    echo -e "${RED}  ❌ No GCP project set. Run: gcloud config set project YOUR_PROJECT_ID${NC}"
-    exit 1
+# Database Connection String
+ALLOYDB_INSTANCE="projects/$PROJECT_ID/locations/$REGION/clusters/$CLUSTER_ID/instances/$INSTANCE_ID"
+
+# Try to load secrets from .env if it exists
+if [ -f .env ]; then
+    export $(cat .env | grep -v '^#' | xargs)
 fi
 
-echo -e "${CYAN}  Deploying AgentFlow to Cloud Run...${NC}"
-echo -e "  Project:  ${PROJECT_ID}"
-echo -e "  Region:   ${REGION}"
-echo -e "  Image:    ${IMAGE}"
-echo ""
+echo "🚀 Deploying to Cloud Run in project: $PROJECT_ID ($REGION)"
 
-# ── Enable required APIs ─────────────────────────────────────────────────────
-echo -e "${CYAN}  [1/5] Enabling APIs...${NC}"
+echo "1. Enabling required APIs..."
 gcloud services enable \
     run.googleapis.com \
+    cloudbuild.googleapis.com \
     artifactregistry.googleapis.com \
-    alloydb.googleapis.com \
-    aiplatform.googleapis.com \
-    --project="$PROJECT_ID" --quiet
+    --project=$PROJECT_ID
 
-# ── Create Artifact Registry repo (if not exists) ────────────────────────────
-echo -e "${CYAN}  [2/5] Setting up Artifact Registry...${NC}"
-gcloud artifacts repositories create "$AR_REPO" \
-    --repository-format=docker \
-    --location="$REGION" \
-    --project="$PROJECT_ID" 2>/dev/null || true
-gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+echo "2. Building Docker Image via Cloud Build..."
+# This builds the image securely in the cloud 
+gcloud builds submit --tag $IMAGE_NAME --project=$PROJECT_ID
 
-# ── Build & push Docker image ────────────────────────────────────────────────
-echo -e "${CYAN}  [3/5] Building Docker image...${NC}"
-docker build -t "${IMAGE}:latest" .
-
-echo -e "${CYAN}  [4/5] Pushing image...${NC}"
-docker push "${IMAGE}:latest"
-
-# ── Deploy to Cloud Run ──────────────────────────────────────────────────────
-echo -e "${CYAN}  [5/5] Deploying to Cloud Run...${NC}"
-gcloud run deploy "$SERVICE_NAME" \
-    --image="${IMAGE}:latest" \
-    --region="$REGION" \
-    --project="$PROJECT_ID" \
-    --platform=managed \
+echo "3. Deploying to Cloud Run..."
+# Notes: 
+# - We expose port 8080 (where Streamlit runs).
+# - We pass the ALLOYDB connection string directly natively.
+# - To connect to AlloyDB seamlessly, we use Direct VPC Egress (--network=$NETWORK).
+gcloud run deploy $SERVICE_NAME \
+    --image $IMAGE_NAME \
+    --region $REGION \
+    --port 8080 \
     --allow-unauthenticated \
-    --port=8080 \
-    --cpu=2 \
-    --memory=2Gi \
-    --min-instances=0 \
-    --max-instances=10 \
-    --timeout=300 \
-    --set-env-vars="GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_REGION=${REGION},PYTHONUNBUFFERED=1" \
-    --quiet
+    --network $NETWORK \
+    --subnet default \
+    --vpc-egress private-ranges-only \
+    --set-env-vars="ALLOYDB_INSTANCE=$ALLOYDB_INSTANCE,GOOGLE_API_KEY=${GOOGLE_API_KEY:-YOUR_API_KEY_HERE}" \
+    --project=$PROJECT_ID
 
-# ── Print URL ─────────────────────────────────────────────────────────────────
-URL=$(gcloud run services describe "$SERVICE_NAME" \
-    --region="$REGION" --project="$PROJECT_ID" \
-    --format='value(status.url)')
-
-echo ""
-echo -e "${GREEN}  ✅ Deployed successfully!${NC}"
-echo -e "${GREEN}  🌐 URL: ${URL}${NC}"
-echo -e "  📖 API docs: ${URL}/docs"
-echo -e "  💬 Chat UI:  ${URL}/"
+echo "✅ App Deployment Complete!"
+echo "You can check your live app using the URL above."

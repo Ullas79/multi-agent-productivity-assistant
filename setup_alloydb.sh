@@ -1,110 +1,77 @@
 #!/bin/bash
-# =============================================================================
-# infra/setup_alloydb.sh
-# Provisions an AlloyDB cluster + primary instance for AgentFlow.
-# Safe to re-run (idempotent).
-# Usage: bash infra/setup_alloydb.sh
-# =============================================================================
+# setup_alloydb.sh - Automates the creation of an AlloyDB cluster and instance
 
-set -euo pipefail
-GREEN='\033[0;32m'; BLUE='\033[0;34m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; NC='\033[0m'
-info()    { echo -e "${BLUE}[AlloyDB]${NC} $*"; }
-success() { echo -e "${GREEN}[OK]${NC}    $*"; }
-warn()    { echo -e "${YELLOW}[WARN]${NC}  $*"; }
-err()     { echo -e "${RED}[ERR]${NC}   $*"; exit 1; }
+set -e
 
-PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project)}"
-REGION="${REGION:-us-central1}"
-CLUSTER="${ALLOYDB_CLUSTER:-agentflow-cluster}"
-INSTANCE="${ALLOYDB_INSTANCE:-agentflow-primary}"
-DB_USER="${DB_USER:-agentflow}"
-DB_NAME="${DB_NAME:-agentflow}"
-DB_PASS="${DB_PASSWORD:-$(openssl rand -base64 20)}"
+PROJECT_ID=$(gcloud config get-value project)
+REGION="us-central1"
+NETWORK="default"
+CLUSTER_ID="my-alloydb-cluster"
+INSTANCE_ID="my-primary-instance"
+DB_PASSWORD="SuperSecretPassword123!" # Change this!
 
-[ -z "$PROJECT_ID" ] && err "Set GOOGLE_CLOUD_PROJECT"
+echo "🚀 Setting up AlloyDB in project: $PROJECT_ID ($REGION)"
 
-info "Project: $PROJECT_ID | Region: $REGION"
-info "Cluster: $CLUSTER  | Instance: $INSTANCE"
+echo "1. Enabling required APIs..."
+gcloud services enable \
+    alloydb.googleapis.com \
+    servicenetworking.googleapis.com \
+    compute.googleapis.com \
+    --project=$PROJECT_ID
 
-# ── Enable required APIs ──────────────────────────────────────────────────────
-info "Enabling AlloyDB & Service Networking APIs..."
-gcloud services enable alloydb.googleapis.com servicenetworking.googleapis.com \
-    --project="$PROJECT_ID" --quiet
-success "APIs enabled"
-
-# ── VPC peering for private connectivity ──────────────────────────────────────
-info "Configuring VPC peering for AlloyDB private IP..."
-gcloud compute addresses create google-managed-services-default \
-    --global --purpose=VPC_PEERING --prefix-length=16 \
-    --network=default --project="$PROJECT_ID" 2>/dev/null \
-    || warn "VPC peering range already exists – skipping"
-
-gcloud services vpc-peerings connect \
-    --service=servicenetworking.googleapis.com \
-    --ranges=google-managed-services-default \
-    --network=default --project="$PROJECT_ID" 2>/dev/null \
-    || warn "VPC peering already configured"
-
-success "VPC peering ready"
-
-# ── Create AlloyDB cluster ─────────────────────────────────────────────────────
-if gcloud alloydb clusters describe "$CLUSTER" \
-       --region="$REGION" --project="$PROJECT_ID" >/dev/null 2>&1; then
-    warn "Cluster '$CLUSTER' already exists – skipping creation"
+echo "2. Setting up VPC Private Services Access on network: $NETWORK"
+# Check if the IP range already exists to avoid errors
+if ! gcloud compute addresses describe google-managed-services-$NETWORK --global --project=$PROJECT_ID > /dev/null 2>&1; then
+    echo "Allocating IP range..."
+    gcloud compute addresses create google-managed-services-$NETWORK \
+        --global \
+        --purpose=VPC_PEERING \
+        --prefix-length=16 \
+        --description="peering range for Google services" \
+        --network=$NETWORK \
+        --project=$PROJECT_ID
 else
-    info "Creating AlloyDB cluster (this takes ~5 minutes)..."
-    gcloud alloydb clusters create "$CLUSTER" \
-        --region="$REGION" \
-        --password="$DB_PASS" \
-        --network=default \
-        --project="$PROJECT_ID" --quiet
-    success "Cluster created"
+    echo "IP range google-managed-services-$NETWORK already exists. Skipping."
 fi
 
-# ── Create primary instance ───────────────────────────────────────────────────
-if gcloud alloydb instances describe "$INSTANCE" \
-       --cluster="$CLUSTER" --region="$REGION" \
-       --project="$PROJECT_ID" >/dev/null 2>&1; then
-    warn "Instance '$INSTANCE' already exists – skipping"
+# Check if the peering connection already exists
+if ! gcloud services vpc-peerings list --network=$NETWORK --project=$PROJECT_ID | grep -q "servicenetworking-googleapis-com"; then
+    echo "Creating VPC peering connection..."
+    gcloud services vpc-peerings connect \
+        --service=servicenetworking.googleapis.com \
+        --ranges=google-managed-services-$NETWORK \
+        --network=$NETWORK \
+        --project=$PROJECT_ID
 else
-    info "Creating primary instance (CPU=2, ~3 minutes)..."
-    gcloud alloydb instances create "$INSTANCE" \
-        --cluster="$CLUSTER" \
-        --region="$REGION" \
+    echo "VPC peering already exists. Skipping."
+fi
+
+echo "3. Creating AlloyDB Cluster ($CLUSTER_ID)..."
+# This can take 10-15 minutes
+if ! gcloud alloydb clusters describe $CLUSTER_ID --region=$REGION --project=$PROJECT_ID > /dev/null 2>&1; then
+    gcloud alloydb clusters create $CLUSTER_ID \
+        --password="$DB_PASSWORD" \
+        --network=$NETWORK \
+        --region=$REGION \
+        --project=$PROJECT_ID
+else
+    echo "Cluster $CLUSTER_ID already exists. Skipping."
+fi
+
+echo "4. Creating AlloyDB Primary Instance ($INSTANCE_ID)..."
+# This can take another 10-15 minutes
+if ! gcloud alloydb instances describe $INSTANCE_ID --cluster=$CLUSTER_ID --region=$REGION --project=$PROJECT_ID > /dev/null 2>&1; then
+    gcloud alloydb instances create $INSTANCE_ID \
+        --cluster=$CLUSTER_ID \
+        --region=$REGION \
         --instance-type=PRIMARY \
         --cpu-count=2 \
-        --project="$PROJECT_ID" --quiet
-    success "Instance created"
+        --project=$PROJECT_ID
+else
+    echo "Instance $INSTANCE_ID already exists. Skipping."
 fi
 
-# ── Get connection info ───────────────────────────────────────────────────────
-PRIVATE_IP=$(gcloud alloydb instances describe "$INSTANCE" \
-    --cluster="$CLUSTER" --region="$REGION" \
-    --project="$PROJECT_ID" \
-    --format='value(ipAddress)' 2>/dev/null || echo "pending")
-
-INSTANCE_URI="projects/${PROJECT_ID}/locations/${REGION}/clusters/${CLUSTER}/instances/${INSTANCE}"
-
+echo "✅ AlloyDB Setup Complete!"
 echo ""
-echo -e "${GREEN}╔══════════════════════════════════════════════════╗${NC}"
-echo -e "${GREEN}║         AlloyDB Provisioned Successfully!        ║${NC}"
-echo -e "${GREEN}╚══════════════════════════════════════════════════╝${NC}"
-echo ""
-echo -e "  Private IP:      ${PRIVATE_IP}"
-echo -e "  Instance URI:    ${INSTANCE_URI}"
-echo -e "  DB User:         ${DB_USER}"
-echo -e "  DB Name:         ${DB_NAME}"
-echo ""
-echo -e "  Add to .env:"
-echo -e "  ALLOYDB_INSTANCE_URI=${INSTANCE_URI}"
-echo -e "  DB_HOST=${PRIVATE_IP}"
-echo -e "  DB_PASSWORD=${DB_PASS}"
-echo ""
-
-# Store in Secret Manager
-info "Storing DB password in Secret Manager..."
-echo -n "$DB_PASS" | gcloud secrets create agentflow-db-password \
-    --data-file=- --project="$PROJECT_ID" 2>/dev/null \
-    || echo -n "$DB_PASS" | gcloud secrets versions add agentflow-db-password \
-    --data-file=- --project="$PROJECT_ID"
-success "Secret stored: agentflow-db-password"
+echo "Your connection string for the backend .env or Cloud Run is:"
+echo "ALLOYDB_INSTANCE=\"projects/$PROJECT_ID/locations/$REGION/clusters/$CLUSTER_ID/instances/$INSTANCE_ID\""

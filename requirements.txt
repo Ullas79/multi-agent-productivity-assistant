@@ -13,3 +13,4 @@ aiosqlite>=0.20.0
 httptools
 uvloop; sys_platform != "win32"
 psycopg2-binary>=2.9.0
+google-cloud-alloydb-connector[asyncpg]>=1.4.0
