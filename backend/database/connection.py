@@ -65,6 +65,7 @@ def _create_default_engine():
                             settings.alloydb_instance,
                             "asyncpg",
                             user=settings.db_user,
+                            password=settings.db_password,
                             db=settings.db_name,
                             enable_iam_auth=getattr(settings, "alloydb_iam_auth", True),
                         )

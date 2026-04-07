@@ -65,7 +65,7 @@ gcloud run deploy $SERVICE_NAME \
     --network $NETWORK \
     --subnet default \
     --vpc-egress private-ranges-only \
-    --set-env-vars="ALLOYDB_INSTANCE=$ALLOYDB_INSTANCE,GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_REGION=$REGION" \
+    --set-env-vars="ALLOYDB_INSTANCE=$ALLOYDB_INSTANCE,GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_REGION=$REGION,DB_USER=postgres,DB_PASSWORD=SuperSecretPassword123\!,ALLOYDB_IAM_AUTH=False" \
     --project=$PROJECT_ID
 
 echo "✅ App Deployment Complete!"
