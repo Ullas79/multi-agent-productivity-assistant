@@ -33,7 +33,13 @@ echo "2. Building Docker Image via Cloud Build..."
 # This builds the image securely in the cloud 
 gcloud builds submit --tag $IMAGE_NAME --project=$PROJECT_ID
 
-echo "3. Deploying to Cloud Run..."
+echo "3. Granting Vertex AI permissions to default compute service account..."
+PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+    --role="roles/aiplatform.user" > /dev/null
+
+echo "4. Deploying to Cloud Run..."
 # Notes: 
 # - We expose port 8080 (where Streamlit runs).
 # - We pass the ALLOYDB connection string directly natively.
@@ -46,7 +52,7 @@ gcloud run deploy $SERVICE_NAME \
     --network $NETWORK \
     --subnet default \
     --vpc-egress private-ranges-only \
-    --set-env-vars="ALLOYDB_INSTANCE=$ALLOYDB_INSTANCE,GOOGLE_API_KEY=${GOOGLE_API_KEY:-YOUR_API_KEY_HERE}" \
+    --set-env-vars="ALLOYDB_INSTANCE=$ALLOYDB_INSTANCE,GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_REGION=$REGION" \
     --project=$PROJECT_ID
 
 echo "✅ App Deployment Complete!"
