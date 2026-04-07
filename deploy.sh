@@ -6,8 +6,9 @@ set -e
 # Default settings
 PROJECT_ID=$(gcloud config get-value project)
 REGION="us-central1"
-SERVICE_NAME="agentflow-app"
-IMAGE_NAME="gcr.io/$PROJECT_ID/$SERVICE_NAME"
+SERVICE_NAME="agentflow"
+REPO_NAME="agentflow-repo"
+IMAGE_NAME="$REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME/$SERVICE_NAME"
 NETWORK="default"
 CLUSTER_ID="my-alloydb-cluster"
 INSTANCE_ID="my-primary-instance"
@@ -29,17 +30,29 @@ gcloud services enable \
     artifactregistry.googleapis.com \
     --project=$PROJECT_ID
 
-echo "2. Building Docker Image via Cloud Build..."
+echo "2. Setting up Artifact Registry..."
+# Create the repo if it doesn't already exist
+gcloud artifacts repositories create $REPO_NAME \
+    --repository-format=docker \
+    --location=$REGION \
+    --description="Docker repository for AgentFlow" \
+    --project=$PROJECT_ID || true
+
+echo "3. Building Docker Image via Cloud Build..."
 # This builds the image securely in the cloud 
 gcloud builds submit --tag $IMAGE_NAME --project=$PROJECT_ID
 
-echo "3. Granting Vertex AI permissions to default compute service account..."
+echo "4. Granting permissions to default compute service account..."
 PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
 gcloud projects add-iam-policy-binding $PROJECT_ID \
     --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
     --role="roles/aiplatform.user" > /dev/null
 
-echo "4. Deploying to Cloud Run..."
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+    --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+    --role="roles/alloydb.client" > /dev/null
+
+echo "5. Deploying to Cloud Run..."
 # Notes: 
 # - We expose port 8080 (where Streamlit runs).
 # - We pass the ALLOYDB connection string directly natively.
