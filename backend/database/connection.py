@@ -142,7 +142,16 @@ async def init_db():
     """Create tables on startup (idempotent)."""
     _ensure_engine()
     from backend.database.models import Base
+    from sqlalchemy import text
     async with engine.begin() as conn:
+        try:
+            # PostgreSQL requires the pgvector extension to be enabled for VECTOR type
+            await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
+        except Exception as e:
+            logger.warning(f"Could not create vector extension (expected if using SQLite): {e}")
+
+        # Drop all tables first since we changed the schema from TIMESTAMP to TIMESTAMP WITH TIME ZONE
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
     logger.info("Database tables created / verified.")
 

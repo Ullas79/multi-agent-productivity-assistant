@@ -33,11 +33,11 @@ class ClinicalTask(Base):
     description = Column(Text, nullable=True)
     status = Column(String(20), nullable=False, default="todo", index=True)
     priority = Column(String(10), nullable=False, default="medium", index=True)
-    due_date = Column(DateTime, nullable=True)
+    due_date = Column(DateTime(timezone=True), nullable=True)
     tags = Column(JSON, default=list)
-    created_at = Column(DateTime, default=_utcnow, index=True)
-    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
-    completed_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=_utcnow, index=True)
+    updated_at = Column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
+    completed_at = Column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (Index("ix_ctasks_status_priority", "status", "priority"),)
 
@@ -65,12 +65,12 @@ class Appointment(Base):
     id = Column(String, primary_key=True)
     patient_name = Column(String(255), nullable=False)
     doctor_name = Column(String(255), nullable=False)
-    start_time = Column(DateTime, nullable=False, index=True)
-    end_time = Column(DateTime, nullable=False, index=True)
+    start_time = Column(DateTime(timezone=True), nullable=False, index=True)
+    end_time = Column(DateTime(timezone=True), nullable=False, index=True)
     location = Column(String(500), nullable=True)
     reason = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=_utcnow)
-    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+    created_at = Column(DateTime(timezone=True), default=_utcnow)
+    updated_at = Column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
 
     __table_args__ = (Index("ix_appt_time_range", "start_time", "end_time"),)
 
@@ -95,8 +95,8 @@ class PatientRecord(Base):
     content = Column(Text, nullable=False)
     tags = Column(JSON, default=list)
     is_pinned = Column(Boolean, default=False, index=True)
-    created_at = Column(DateTime, default=_utcnow, index=True)
-    updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow)
+    created_at = Column(DateTime(timezone=True), default=_utcnow, index=True)
+    updated_at = Column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
 
     if HAS_PGVECTOR:
         embedding = Column(Vector(768), nullable=True)
@@ -120,7 +120,7 @@ class AgentMemory(Base):
     role = Column(String(50), nullable=False)
     content = Column(Text, nullable=False)
     agent_name = Column(String(100), nullable=True)
-    created_at = Column(DateTime, default=_utcnow)
+    created_at = Column(DateTime(timezone=True), default=_utcnow)
 
     def to_dict(self) -> dict:
         return {
