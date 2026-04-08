@@ -14,24 +14,24 @@ tasks_server = Server("task_manager")
 async def handle_list_tools() -> list[types.Tool]:
     return [
         types.Tool(
-            name="create_clinical_task",
-            description="Create a new clinical task for a patient.",
+            name="create_task",
+            description="Create a new task in the productivity hub.",
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "title": {"type": "string", "description": "Task title (e.g., Check Vitals)"},
-                    "patient_name": {"type": "string", "description": "Name of the patient"},
-                    "description": {"type": "string", "description": "Detailed medical description"},
+                    "title": {"type": "string", "description": "Task title (e.g., Prepare Presentation)"},
+                    "owner": {"type": "string", "description": "Who this task is for (defaults to user)"},
+                    "description": {"type": "string", "description": "Detailed task description"},
                     "priority": {"type": "string", "enum": ["low", "medium", "high"]},
                     "due_date": {"type": "string", "description": "Due date in ISO format"},
                     "tags": {"type": "array", "items": {"type": "string"}},
                 },
-                "required": ["title", "patient_name"],
+                "required": ["title"],
             },
         ),
         types.Tool(
-            name="list_clinical_tasks",
-            description="List clinical tasks.",
+            name="list_tasks",
+            description="List and filter tasks in the productivity hub.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -46,27 +46,27 @@ async def handle_list_tools() -> list[types.Tool]:
 async def handle_call_tool(name: str, arguments: dict | None) -> list[types.TextContent]:
     arguments = arguments or {}
     
-    if name == "create_clinical_task":
+    if name == "create_task":
         async with db_conn.AsyncSessionLocal() as db:
             task = await crud.create_task(
                 db,
                 title=arguments.get("title"),
-                patient_name=arguments.get("patient_name"),
+                patient_name=arguments.get("owner", "user"),
                 description=arguments.get("description", ""),
                 priority=arguments.get("priority", "medium"),
                 due_date=arguments.get("due_date"),
                 tags=arguments.get("tags", []),
             )
             await db.commit()
-        return [types.TextContent(type="text", text=f"Clinical Task created for {task.patient_name}: '{task.title}'")]
+        return [types.TextContent(type="text", text=f"Task '{task.title}' created successfully.")]
 
-    elif name == "list_clinical_tasks":
+    elif name == "list_tasks":
         async with db_conn.AsyncSessionLocal() as db:
             tasks = await crud.get_tasks(db, status=arguments.get("status"), priority=arguments.get("priority"))
         if not tasks: return [types.TextContent(type="text", text="No tasks found.")]
         lines = [f"Found {len(tasks)} task(s):\n"]
         for t in tasks:
-            lines.append(f"- [{t.status}] {t.title} for Patient: {t.patient_name} (Priority: {t.priority})")
+            lines.append(f"- [{t.status}] {t.title} (Owner: {t.patient_name}, Priority: {t.priority})")
         return [types.TextContent(type="text", text="\n".join(lines))]
 
     raise ValueError(f"Unknown tool: {name}")

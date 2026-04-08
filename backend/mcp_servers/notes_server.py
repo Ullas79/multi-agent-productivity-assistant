@@ -21,11 +21,11 @@ async def handle_list_tools() -> list[types.Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "patient_name": {"type": "string", "description": "The name of the patient"},
-                    "content": {"type": "string", "description": "The full text content"},
-                    "tags": {"type": "array", "items": {"type": "string"}, "description": "Optional tags"},
+                    "owner": {"type": "string", "description": "The creator or subject of the note (defaults to user)"},
+                    "content": {"type": "string", "description": "The full text content to be vectorized"},
+                    "tags": {"type": "array", "items": {"type": "string"}, "description": "Optional tags for categorization"},
                 },
-                "required": ["patient_name", "content"],
+                "required": ["content"],
             },
         ),
         types.Tool(
@@ -55,20 +55,20 @@ async def handle_call_tool(name: str, arguments: dict | None) -> list[types.Text
             results = await crud.semantic_search_notes(db, query, limit=limit)
         if not results:
             return [types.TextContent(type="text", text="No semantically similar notes found.")]
-        output = f"Top {len(results)} most relevant notes:\n\n"
+        output = f"Top {len(results)} most relevant insights from Agentic Memory:\n\n"
         for i, note in enumerate(results, 1):
             preview = note.content[:500]
-            output += f"{i}. Patient: {note.patient_name}\n{preview}...\n\n"
+            output += f"{i}. Context: {note.patient_name}\n{preview}...\n\n"
         return [types.TextContent(type="text", text=output)]
 
     elif name == "create_note":
-        patient_name = arguments.get("patient_name", "Unknown")
+        owner = arguments.get("owner", "user")
         content = arguments.get("content", "")
         tags = arguments.get("tags", [])
         async with db_conn.AsyncSessionLocal() as db:
-            await crud.create_note(db, patient_name, content, tags)
+            await crud.create_note(db, owner, content, tags)
             await db.commit()
-        return [types.TextContent(type="text", text=f"Record for '{patient_name}' created successfully.")]
+        return [types.TextContent(type="text", text="Note stored in Agentic Memory with semantic indexing.")]
 
     raise ValueError(f"Unknown tool: {name}")
 

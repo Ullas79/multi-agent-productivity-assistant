@@ -17,6 +17,14 @@ from backend.database.models import (
     ClinicalTask,
     PatientRecord,
 )
+from backend.config import settings
+
+try:
+    from google.cloud import aiplatform
+    from vertexai.language_models import TextEmbeddingModel
+    HAS_VERTEX = True
+except ImportError:
+    HAS_VERTEX = False
 
 logger = logging.getLogger(__name__)
 
@@ -207,6 +215,26 @@ async def delete_event(db: AsyncSession, event_id: str) -> bool:
 
 
 # ── Patient Records (EHR) ─────────────────────────────────────────────────────
+async def get_embedding(text: str) -> Optional[List[float]]:
+    """Generate embedding using Vertex AI text-embedding-004."""
+    if not HAS_VERTEX or not text:
+        return None
+    try:
+        # Note: This is a synchronous call in the SDK, so we run it in a thread
+        import asyncio
+        from functools import partial
+
+        def _fetch():
+            model = TextEmbeddingModel.from_pretrained(settings.embedding_model)
+            embeddings = model.get_embeddings([text])
+            return embeddings[0].values
+
+        return await asyncio.get_event_loop().run_in_executor(None, _fetch)
+    except Exception as e:
+        logger.warning(f"Failed to generate embedding: {e}")
+        return None
+
+
 async def create_note(
     db: AsyncSession,
     patient_name: str,
@@ -214,12 +242,16 @@ async def create_note(
     tags: list = None,
     is_pinned: bool = False,
 ) -> PatientRecord:
+    # Generate embedding for the content
+    embedding = await get_embedding(content)
+
     record = PatientRecord(
         id=str(uuid.uuid4()),
         patient_name=patient_name,
         content=content,
         tags=tags or [],
         is_pinned=is_pinned,
+        embedding=embedding if HAS_PGVECTOR else None,
     )
     db.add(record)
     await db.flush()
@@ -288,5 +320,23 @@ async def semantic_search_notes(
     query: str,
     limit: int = 3,
 ) -> List[PatientRecord]:
-    """Fallback text search in place of pgvector semantic search."""
-    return await get_notes(db, search=query, limit=limit)
+    """Perform semantic search using pgvector and Vertex AI."""
+    if not HAS_PGVECTOR:
+        logger.warning("pgvector not available - falling back to text search")
+        return await get_notes(db, search=query, limit=limit)
+
+    query_embedding = await get_embedding(query)
+    if not query_embedding:
+        logger.warning("Failed to get query embedding - falling back to text search")
+        return await get_notes(db, search=query, limit=limit)
+
+    # Use pgvector distance operator <-> (L2 distance) or <=> (Cosine distance)
+    # AlloyDB supports both. We'll use L2 for simplicity as it's common.
+    stmt = (
+        select(PatientRecord)
+        .order_by(PatientRecord.embedding.l2_distance(query_embedding))
+        .limit(limit)
+    )
+    
+    result = await db.execute(stmt)
+    return result.scalars().all()

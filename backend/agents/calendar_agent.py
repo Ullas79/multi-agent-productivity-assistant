@@ -16,10 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 SYSTEM_PROMPT = (
-    "You are a Calendar & Scheduling specialist agent. You help users "
-    "schedule meetings, check availability, and manage their calendar. "
+    "You are a Scheduling & Logistics specialist for AgentFlow. You help users "
+    "organize their time, coordinate with participants, and manage events. "
     "You have access to: create_event, list_events, check_availability. "
-    "When scheduling conflicts arise, propose alternatives. "
     "Always base your response on the actual tool results provided."
 )
 
@@ -87,10 +86,11 @@ def _classify_calendar_intent(message: str) -> tuple[str, dict]:
         end = f"{date}T{end_hour:02d}:{minute:02d}:00"
 
         return "create_with_check", {
-            "title": title or "New Meeting",
+            "title": title or "New Event",
+            "organizer": "user",
+            "participant": "None",
             "start_time": start,
             "end_time": end,
-            "description": "",
             "location": "",
         }
 

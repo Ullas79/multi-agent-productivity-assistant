@@ -14,9 +14,9 @@ logger = logging.getLogger(__name__)
 
 
 SYSTEM_PROMPT = (
-    "You are a Task Management specialist agent. You help users create, "
-    "organise, and track their clinical tasks. You have access to the following "
-    "tools: create_clinical_task, list_clinical_tasks, update_task, complete_task. "
+    "You are a Task Management specialist agent for AgentFlow. You help users create, "
+    "organise, and track their daily tasks and projects. You have access to the following "
+    "tools: create_task, list_tasks, update_task, complete_task. "
     "Always respond based on the actual tool results provided. "
     "Be concise and action-oriented."
 )
@@ -42,9 +42,8 @@ def _classify_task_intent(message: str) -> tuple[str, dict]:
         priority = "high" if "urgent" in msg or "important" in msg else "medium"
         if "low" in msg:
             priority = "low"
-        return "create_clinical_task", {
+        return "create_task", {
             "title": title or "New Task",
-            "patient_name": "Unknown Patient", # Placeholder if none extracted easily
             "priority": priority,
             "description": "",
         }
@@ -63,10 +62,10 @@ def _classify_task_intent(message: str) -> tuple[str, dict]:
             priority = "high"
         elif "low" in msg:
             priority = "low"
-        return "list_clinical_tasks", {"status": status, "priority": priority, "limit": 10}
+        return "list_tasks", {"status": status, "priority": priority, "limit": 10}
 
     # Default: list tasks and let LLM reason
-    return "list_clinical_tasks", {"limit": 10}
+    return "list_tasks", {"limit": 10}
 
 
 async def run(

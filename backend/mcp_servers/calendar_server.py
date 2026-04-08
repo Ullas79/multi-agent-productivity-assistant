@@ -27,14 +27,14 @@ async def handle_list_tools() -> list[types.Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "patient_name": {"type": "string", "description": "Patient's name"},
-                    "doctor_name": {"type": "string", "description": "Doctor's name"},
+                    "organizer": {"type": "string", "description": "Who is organizing the event"},
+                    "participant": {"type": "string", "description": "Other participants"},
                     "start_time": {"type": "string", "description": "Start time in ISO format"},
                     "end_time": {"type": "string", "description": "End time in ISO format"},
-                    "reason": {"type": "string", "description": "Reason for appointment"},
-                    "location": {"type": "string", "description": "Location or room"},
+                    "title": {"type": "string", "description": "Event title or reason"},
+                    "location": {"type": "string", "description": "Location or meeting link"},
                 },
-                "required": ["patient_name", "doctor_name", "start_time", "end_time"],
+                "required": ["organizer", "participant", "start_time", "end_time"],
             },
         ),
         types.Tool(
@@ -73,21 +73,21 @@ async def handle_call_tool(name: str, arguments: dict | None) -> list[types.Text
         async with db_conn.AsyncSessionLocal() as db:
             event = await crud.create_event(
                 db,
-                patient_name=arguments.get("patient_name", "Unknown"),
-                doctor_name=arguments.get("doctor_name", "Unknown"),
+                patient_name=arguments.get("organizer", "Unknown"),
+                doctor_name=arguments.get("participant", "Unknown"),
                 start_time=arguments.get("start_time"),
                 end_time=arguments.get("end_time"),
-                reason=arguments.get("reason", ""),
+                reason=arguments.get("title", ""),
                 location=arguments.get("location", ""),
             )
             await db.commit()
         return [types.TextContent(
             type="text",
             text=(
-                f"Appointment scheduled: {event.patient_name} with Dr. {event.doctor_name}\n"
+                f"Event scheduled: '{event.reason}' with {event.doctor_name}\n"
                 f"  📅 {event.start_time.strftime('%Y-%m-%d %H:%M')} → {event.end_time.strftime('%H:%M')}\n"
                 f"  📍 {event.location or 'No location'}\n"
-                f"  ID: {event.id}"
+                f"  Organizer: {event.patient_name}"
             ),
         )]
 
@@ -108,13 +108,13 @@ async def handle_call_tool(name: str, arguments: dict | None) -> list[types.Text
                 limit=arguments.get("limit", 10),
             )
         if not events:
-            return [types.TextContent(type="text", text="No upcoming events found in that time range.")]
+            return [types.TextContent(type="text", text="No upcoming events found.")]
         lines = [f"Found {len(events)} upcoming event(s):\n"]
         for i, e in enumerate(events, 1):
             lines.append(
-                f"{i}. 📅 {e.patient_name} with Dr. {e.doctor_name}\n"
+                f"{i}. 📅 {e.reason} (with {e.doctor_name})\n"
                 f"   {e.start_time.strftime('%a %b %d, %H:%M')} → {e.end_time.strftime('%H:%M')}\n"
-                f"   📍 {e.location or 'No location'}  ID:{e.id}"
+                f"   📍 {e.location or 'No location'}  Organizer: {e.patient_name}"
             )
         return [types.TextContent(type="text", text="\n".join(lines))]
 
@@ -137,7 +137,7 @@ async def handle_call_tool(name: str, arguments: dict | None) -> list[types.Text
         lines = [f"⚠️ CONFLICT – {len(events)} event(s) overlap with that time slot:\n"]
         for e in events:
             lines.append(
-                f"  - {e.patient_name} with Dr. {e.doctor_name} ({e.start_time.strftime('%H:%M')}–{e.end_time.strftime('%H:%M')})"
+                f"  - {e.reason} with {e.doctor_name} ({e.start_time.strftime('%H:%M')}–{e.end_time.strftime('%H:%M')})"
             )
         return [types.TextContent(type="text", text="\n".join(lines))]
 

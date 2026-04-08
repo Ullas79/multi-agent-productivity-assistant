@@ -17,7 +17,8 @@ class Settings(BaseSettings):
     # GCP / Vertex AI Settings
     google_cloud_project: str = ""
     google_cloud_region: str = "us-central1"
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-2.5-flash"  # Flash 2.5 is the new enterprise standard
+    embedding_model: str = "text-embedding-004"
     google_api_key: str = ""
 
     # Database settings

@@ -13,11 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 SYSTEM_PROMPT = (
-    "You are a Notes & Knowledge Management specialist agent. You help users "
-    "create, search, and organise their notes and knowledge base. "
+    "You are an Agentic Memory & Knowledge specialist for AgentFlow. You help users "
+    "store, search, and recall information from their long-term digital memory. "
     "You have access to: create_note, semantic_search. "
-    "When searching, always present the most relevant results with context. "
-    "Base your response on the actual tool results provided."
+    "When searching, focus on finding conceptual connections. "
+    "Base your response on the actual memory results provided."
 )
 
 
@@ -39,8 +39,8 @@ def _classify_notes_intent(message: str) -> tuple[str, dict]:
         note_title = parts[0].strip() or "Untitled Note"
         note_content = parts[1].strip() if len(parts) > 1 else title
         return "create_note", {
-            "title": note_title[:100],
-            "content": note_content,
+            "owner": "user",
+            "content": f"{note_title}: {note_content}",
             "tags": [],
         }
 
