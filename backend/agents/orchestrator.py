@@ -75,7 +75,7 @@ async def run_agent(message: str, session_id: str):
             contents.append(
                 types.Content(
                     role=role,
-                    parts=[types.Part.from_text(mem.content)],
+                    parts=[types.Part.from_text(text=mem.content)],
                 )
             )
 
@@ -83,7 +83,7 @@ async def run_agent(message: str, session_id: str):
         contents.append(
             types.Content(
                 role="user",
-                parts=[types.Part.from_text(message)],
+                parts=[types.Part.from_text(text=message)],
             )
         )
 

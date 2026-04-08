@@ -25,7 +25,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.agents.orchestrator import run_agent
 from backend.config import get_settings
 from backend.database import crud
-from backend.database.connection import AsyncSessionLocal, close_db, get_db, init_db
+from backend.database.connection import close_db, get_db, get_session_factory, init_db
 from backend.exceptions import register_exception_handlers
 from backend.middleware import RequestLoggingMiddleware, SecurityHeadersMiddleware
 from backend.schemas import (
@@ -111,7 +111,8 @@ async def chat_sse(req: ChatRequest, db: AsyncSession = Depends(get_db)):
 
         if full_response:
             try:
-                async with AsyncSessionLocal() as save_db:
+                SessionFactory = get_session_factory()
+                async with SessionFactory() as save_db:
                     await crud.save_memory(
                         save_db, session_id, "assistant", full_response, "orchestrator"
                     )
