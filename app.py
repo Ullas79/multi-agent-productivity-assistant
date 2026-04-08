@@ -67,33 +67,65 @@ if prompt := st.chat_input("Ask the Hospital Orchestrator..."):
                     timeout=120,
                 ) as r:
                     r.raise_for_status()
-                    for line in r.iter_lines():
-                        if line:
-                            decoded_line = line.decode("utf-8")
-                            if decoded_line.startswith("data: "):
-                                payload = decoded_line[6:]
+                    buffer = ""
+                    done = False
+                    saw_error = False
+
+                    for chunk in r.iter_content(chunk_size=None):
+                        if not chunk:
+                            continue
+
+                        buffer += chunk.decode("utf-8", errors="ignore")
+
+                        # SSE events are separated by a blank line
+                        while "\n\n" in buffer:
+                            event, buffer = buffer.split("\n\n", 1)
+
+                            for line in event.splitlines():
+                                if not line.startswith("data: "):
+                                    continue
+
+                                payload = line[6:].strip()
+                                if not payload:
+                                    continue
+
                                 try:
                                     data = json.loads(payload)
                                 except json.JSONDecodeError:
                                     continue
 
-                                if data.get("type") == "text":
+                                event_type = data.get("type")
+
+                                if event_type == "text":
                                     full_response += data.get("content", "")
                                     message_placeholder.markdown(full_response + "▌")
 
-                                if data.get("type") == "session_id" and data.get(
+                                elif event_type == "session_id" and data.get(
                                     "session_id"
                                 ):
                                     st.session_state.session_id = data["session_id"]
 
-                                if data.get("type") == "done":
+                                elif event_type == "error":
+                                    saw_error = True
+                                    full_response += (
+                                        f"\n\n⚠️ {data.get('content', 'Unknown error')}"
+                                    )
+
+                                elif event_type == "done":
+                                    done = True
                                     break
+
+                            if done:
+                                break
+
+                        if done:
+                            break
 
                 status.update(
                     label="Workflow Complete!", state="complete", expanded=False
                 )
 
-                if not full_response.strip():
+                if not full_response.strip() and not saw_error:
                     full_response = "No response received from orchestrator."
 
                 message_placeholder.markdown(full_response)
